@@ -1,6 +1,6 @@
 import {AppSettings} from "../AppSettings";
 import axios from 'axios';
-import Resource from "../interfaces/Resource";
+import Resource from "../model/Resource";
 
 export class ResourceService {
     async getResources():Promise<Resource[]>{

@@ -1,5 +1,5 @@
 import axios, {AxiosResponse} from "axios/index";
-import Keys from "../interfaces/Keys";
+import Keys from "../model/Keys";
 import {AppSettings} from "../AppSettings";
 
 export class UserService {

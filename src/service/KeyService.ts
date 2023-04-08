@@ -1,4 +1,4 @@
-import Keys from "../interfaces/Keys";
+import Keys from "../model/Keys";
 import {AppSettings} from "../AppSettings";
 import axios from 'axios';
 

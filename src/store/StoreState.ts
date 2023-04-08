@@ -1,4 +1,4 @@
-import Resource from "../interfaces/Resource";
+import Resource from "../model/Resource";
 
 export interface StoreState {
     googleClientId: string | null;

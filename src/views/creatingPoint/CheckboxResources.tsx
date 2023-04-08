@@ -1,4 +1,4 @@
-import Resource from "../../interfaces/Resource";
+import Resource from "../../model/Resource";
 import {Checkbox, FormControlLabel, FormGroup, InputLabel, List, ListItem} from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import HelpIcon from "@mui/icons-material/Help";
