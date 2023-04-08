@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export class KeyService {
     async getKeys():Promise<Keys>{
-        let res= await axios.get(`${AppSettings.API_ENDPOINT}/keys`);
+        let res= await axios.get(`${AppSettings.API_ENDPOINT}/public/keys`);
         return res.data
     }
 }
