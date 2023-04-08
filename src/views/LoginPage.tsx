@@ -18,7 +18,7 @@ import {useNavigate} from "react-router-dom";
 import {ProfileContext} from "../components/ProfileProvider";
 import {useSelector} from "react-redux";
 import {StoreState} from "../store/StoreState";
-import {AuthService} from "../service/AuthService";
+import AuthService from "../service/AuthService";
 
 export default function LoginPage() {
     const {setProfile} = useContext(ProfileContext);
@@ -29,7 +29,8 @@ export default function LoginPage() {
         const formData = new FormData(event.currentTarget);
         const username = formData.get('email')?.toString();
         const password = formData.get('password')?.toString();
-        console.log(await new AuthService().signin({username: username, password: password}))
+        if (username!==undefined && password!==undefined)
+            console.log(await AuthService.login( username, password))
     };
     const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ("profileObj" in res) {

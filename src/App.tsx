@@ -13,23 +13,11 @@ import Keys from "./model/Keys";
 import CreatingPointPage from "./views/creatingPoint/CreatingPointPage";
 import {changeResources} from "./store/actionCreators/changeResources";
 import {ResourceService} from "./service/ResourceService";
-import Cookies from "universal-cookie";
-import {AuthService} from "./service/AuthService";
-import isAccessTokenExpired from "./helpers/isAccessTokenExpired";
 
 export default function App() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const cookies = new Cookies();
-
-        if (isAccessTokenExpired()) {
-            new AuthService().refreshtoken(cookies.get('refreshToken')).then(res => {
-                const {accessToken, refreshToken} = res;
-                cookies.set('accessToken', accessToken, {httpOnly: true});
-                cookies.set('refreshToken', refreshToken, {httpOnly: true});
-            });
-        }
 
         const fetchData = async () => {
             const data: Keys = await new KeyService().getKeys();
