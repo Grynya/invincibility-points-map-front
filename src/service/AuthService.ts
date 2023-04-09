@@ -1,65 +1,97 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, {AxiosResponse} from 'axios';
 import {AppSettings} from "../AppSettings";
-import Cookies from "universal-cookie"
-interface LoginResponse {
+import {useDispatch} from "react-redux";
+import store from "../store/store"
+import {Store} from 'redux';
+import {changeUser} from "../store/actionCreators/changeUser";
+import {EUserStatus} from "../model/EUserStatus";
+
+interface JwtResponse {
     accessToken: string;
     refreshToken: string;
     expiresIn: number;
+    type: string;
+    id: number;
+    name: string;
+    surname: string;
+    email: string;
+    code: string;
+    userStatus: EUserStatus;
+    roles: string[];
+
 }
 
 interface RefreshResponse {
     accessToken: string;
+    refreshToken: string;
     expiresIn: number;
+    tokenType: string;
 }
 
 class AuthService {
     token: string | null;
     refreshToken: string | null;
     refreshTimeout: ReturnType<typeof setTimeout> | null;
+    store: Store;
 
     constructor() {
         this.token = null;
         this.refreshToken = null;
         this.refreshTimeout = null;
+        this.store = store
+
+        // Check if there is a token refresh timeout duration stored in localStorage
+        const storedTimeoutDuration = localStorage.getItem('tokenRefreshTimeoutDuration');
+        if (storedTimeoutDuration) {
+            const remainingTimeoutDuration = parseInt(storedTimeoutDuration) - (Date.now() - parseInt(localStorage.getItem('tokenRefreshTimeoutStartTime')!));
+            if (remainingTimeoutDuration > 0) {
+                this.scheduleTokenRefresh(remainingTimeoutDuration);
+            }
+            // Clear the stored token refresh timeout duration
+            localStorage.removeItem('tokenRefreshTimeoutDuration');
+            localStorage.removeItem('tokenRefreshTimeoutStartTime');
+        }
     }
 
     async login(username: string, password: string): Promise<boolean> {
         try {
-            const response: AxiosResponse<LoginResponse> = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/signin`, {
+
+            const response: AxiosResponse<JwtResponse> = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/signin`, {
                 username,
                 password,
             });
-            const cookie = new Cookies();
 
-            const { accessToken, refreshToken, expiresIn } = response.data;
+            const {accessToken, refreshToken, expiresIn, name, surname, email, code, userStatus, roles} = response.data;
+            this.store.dispatch(changeUser({name, surname, email, code, userStatus, roles}));
 
             this.token = accessToken;
             this.refreshToken = refreshToken;
-            cookie.set("access_token", accessToken, {httpOnly: true})
-            cookie.set("refresh_token", refreshToken, {httpOnly: true})
+            localStorage.setItem("access_token", accessToken)
+            localStorage.setItem("refresh_token", refreshToken)
 
             this.scheduleTokenRefresh(expiresIn);
 
             return true;
         } catch (error) {
-            console.error('Authentication failed:', error);
-            return false;
+            throw new Error(`Authentication failed:${error}`)
         }
     }
 
     async doRefreshToken(): Promise<boolean> {
         try {
-            const response: AxiosResponse<RefreshResponse> = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/refreshtoken`, {
-                refreshToken: this.refreshToken,
+            let response: AxiosResponse<RefreshResponse>
+                = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/refreshtoken`, {
+                refreshToken: this.refreshToken ? this.refreshToken : localStorage.getItem("refresh_token"),
             });
 
-            const { accessToken, expiresIn } = response.data;
+            const {accessToken, refreshToken, expiresIn} = response.data;
+            console.log(response.data)
 
             this.token = accessToken;
 
             this.scheduleTokenRefresh(expiresIn);
-            const cookie = new Cookies();
-            cookie.get("access_token")
+            localStorage.setItem("access_token", accessToken)
+            localStorage.setItem("refresh_token", refreshToken)
 
             return true;
         } catch (error) {
@@ -77,21 +109,27 @@ class AuthService {
 
         this.refreshTimeout = setTimeout(() => {
             this.doRefreshToken();
-            console.log("time")
+            console.log("time");
+            localStorage.setItem('tokenRefreshTimeoutDuration', timeoutDuration.toString());
+            localStorage.setItem('tokenRefreshTimeoutStartTime', Date.now().toString());
         }, timeoutDuration);
     }
 
-    logout(): void {
+    logout = (): void => {
         this.token = null;
         this.refreshToken = null;
 
         if (this.refreshTimeout) {
             clearTimeout(this.refreshTimeout);
         }
+        this.store.dispatch(changeUser(null));
 
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('tokenRefreshTimeoutDuration');
+        localStorage.removeItem('tokenRefreshTimeoutStartTime');
     }
+
 
     getToken(): string | null {
         return this.token;

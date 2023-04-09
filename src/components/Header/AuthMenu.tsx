@@ -9,11 +9,12 @@ import {useSelector} from "react-redux";
 import useStyles from "./styles";
 import {ProfileContext} from "../ProfileProvider";
 import {StoreState} from "../../store/StoreState";
-
+import AuthService from "../../service/AuthService"
 export default function AuthMenu() {
     const { profile, setProfile } = useContext(ProfileContext);
     const [anchorEl, setAnchorEl] = useState<any>(null);
     const clientId = useSelector<StoreState, string|null>((state: StoreState) => state.googleClientId);
+    const user = useSelector((state: StoreState) => state.user);
     const classes:ClassNameMap = useStyles();
     const handleClick = (event:React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget);
 
@@ -38,6 +39,7 @@ export default function AuthMenu() {
         open={Boolean(anchorEl)}
         onClose={handleClose}
     >
+        {/*only for Google oAuth menu*/}
         {profile!== null && clientId!==null?
             <div className="profile-desc">
                 <img src={profile.imageUrl} width={"50px"} height={"50px"} alt={"img"}/>
@@ -51,19 +53,31 @@ export default function AuthMenu() {
                     onLogoutSuccess={logout}
                 />
             </div> : null}
-        {profile === null ?
+        {profile === null && user===null ?
             <a href="/login" className="no-text-decoration">
                 <MenuItem>
                     <LoginIcon style={{margin: 5}}/>
                     Увійти
                 </MenuItem></a> : null}
-        {profile === null ?
+        {profile === null && user===null ?
             <a href="/registration" className="no-text-decoration">
                 <MenuItem>
                     <PersonAddIcon style={{margin: 5}}/>
                     Зареєструватись
                 </MenuItem>
             </a> : null}
+        {/*only for JWT authorization menu when user logged in with jwt*/}
+        {user!==null ?
+            <div className="profile-desc">
+                <p className="bold-text">{user.name}</p>
+                <p className="bold-text">{user.surname}</p>
+                <p className="light-text">{user.email}</p>
+                <hr/>
+                <MenuItem onClick={AuthService.logout}>
+                    <PersonAddIcon style={{margin: 5}}/>
+                    Вийти
+                </MenuItem>
+            </div> : null}
     </Menu></Toolbar>
 
 }

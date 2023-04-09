@@ -12,26 +12,35 @@ import Container from '@mui/material/Container';
 import Header from "../components/Header/Header";
 import Copyright from "../components/Copyright";
 import {GoogleLogin, GoogleLoginResponse, GoogleLoginResponseOffline} from "react-google-login";
-import {useContext, useEffect} from "react";
+import {useContext, useEffect, useState} from "react";
 import {gapi} from 'gapi-script';
 import {useNavigate} from "react-router-dom";
 import {ProfileContext} from "../components/ProfileProvider";
 import {useSelector} from "react-redux";
 import {StoreState} from "../store/StoreState";
 import AuthService from "../service/AuthService";
-
+import ErrorAlert from "../components/alerts/ErrorAlert";
 export default function LoginPage() {
     const {setProfile} = useContext(ProfileContext);
     const navigate = useNavigate();
     const clientId = useSelector((state: StoreState) => state.googleClientId);
+    const [error, setError] = useState({message: "", visible: false});
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const username = formData.get('email')?.toString();
-        const password = formData.get('password')?.toString();
-        if (username!==undefined && password!==undefined)
-            console.log(await AuthService.login( username, password))
-    };
+        try {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const username = formData.get('email')?.toString();
+            const password = formData.get('password')?.toString();
+            if (username !== undefined && password !== undefined) {
+                await AuthService.login(username, password)
+                navigate("/");
+            } else throw new Error ("Empty email or data")
+        }catch (error) {
+            if (error instanceof Error) {
+                setError({message: error.message, visible: true});
+            }
+        }
+    }
     const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ("profileObj" in res) {
             setProfile(res.profileObj);
@@ -111,6 +120,7 @@ export default function LoginPage() {
                                 className={"google-btn-style"}
                             />
                             <Grid container sx={{mt: 3}}>
+                                <ErrorAlert error={error} setError={setError}/>
                                 <Grid item xs>
                                     <Link href="#" variant="body2">
                                         Забули пароль?

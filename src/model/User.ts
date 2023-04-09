@@ -7,6 +7,7 @@ export default interface User {
     email: string;
     password: string;
     code: string;
-    status: EUserStatus;
+    userStatus: EUserStatus;
+    roles: string[];
 
 }

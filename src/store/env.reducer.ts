@@ -5,6 +5,7 @@ const initialState: StoreState = {
     googleClientId: null,
     mapboxAccessToken: null,
     resources: null,
+    user: null,
 };
 
 const envReducer = (state = initialState, action: SettingActions) => {
