@@ -12,8 +12,6 @@ import {Divider} from "@mui/material";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import {useNavigate} from 'react-router-dom';
-import {useSelector} from "react-redux";
-import {StoreState} from "../store/StoreState";
 
 const drawerWidth = 340;
 
@@ -48,7 +46,6 @@ export default function MainPage() {
     const theme = useTheme();
     const [open, setOpen] = React.useState<boolean>(false);
     const navigate = useNavigate();
-    const user = useSelector((state: StoreState) => state.user);
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -90,7 +87,7 @@ export default function MainPage() {
                     </IconButton>
                 </DrawerHeader>
                 <Divider/>
-                {user !== null ? <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', p: 2}}>
+                {localStorage.getItem("user") ? <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', p: 2}}>
                     <Button variant="contained" color="primary" onClick={() => navigate('/addpoint')}>
                         Додати пункт на мапу
                     </Button>

@@ -18,7 +18,6 @@ export default function App() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-
         const fetchData = async () => {
             const data: Keys = await new KeyService().getKeys();
             const resources = await new ResourceService().getResources();

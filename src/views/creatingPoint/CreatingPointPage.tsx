@@ -8,7 +8,6 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Header from "../../components/Header/Header";
 import Copyright from "../../components/Copyright";
-import {GoogleLoginResponse, GoogleLoginResponseOffline} from "react-google-login";
 import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
@@ -19,6 +18,8 @@ import Loading from "../../components/Loading";
 import Button from "@mui/material/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import CheckboxResources from "./CheckboxResources"
+import 'mapbox-gl/dist/mapbox-gl.css';
+import MapboxSmall from "../../components/Map/MapboxSmall";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -42,23 +43,24 @@ export default function CreatingPointPage() {
             password: data.get('password'),
         });
     };
-    const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-        // if ("profileObj" in res) {
-        //     setProfile(res.profileObj);
-        // }
-        // navigate('/');
-    };
 
-    const onFailure = (err: any) => {
-        console.log('failed', err);
-    };
+    // const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
+    //     // if ("profileObj" in res) {
+    //     //     setProfile(res.profileObj);
+    //     // }
+    //     // navigate('/');
+    // };
+    //
+    // const onFailure = (err: any) => {
+    //     console.log('failed', err);
+    // };
 
     return (
         clientId === null || resources === null ? <Loading/> :
             <>
                 <CssBaseline/>
                 <Header open={false}/>
-                <Container component="main" maxWidth="xs">
+                <Container component="main" className="custom-cursor" maxWidth="lg">
                     <CssBaseline/>
                     <Box
                         component="div"
@@ -76,6 +78,7 @@ export default function CreatingPointPage() {
                             Створення нового пункту
                         </Typography>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
+                            <div id="map-popup" className="custom-cursor" style={{ height: '400px', width: '100%' }} />
                             <TextField
                                 sx={{mt: 1, mb: 1}}
                                 margin="normal"
@@ -143,6 +146,7 @@ export default function CreatingPointPage() {
                                 </div>
                             </FormGroup>
                             <CheckboxResources resources={resources}/>
+                            <MapboxSmall/>
                             <Button
                                 className={classes.root}
                                 type="submit"

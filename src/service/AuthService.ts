@@ -1,9 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
 import {AppSettings} from "../AppSettings";
-import {useDispatch} from "react-redux";
 import store from "../store/store"
 import {Store} from 'redux';
-import {changeUser} from "../store/actionCreators/changeUser";
 import {EUserStatus} from "../model/EUserStatus";
 
 interface JwtResponse {
@@ -29,14 +27,10 @@ interface RefreshResponse {
 }
 
 class AuthService {
-    token: string | null;
-    refreshToken: string | null;
     refreshTimeout: ReturnType<typeof setTimeout> | null;
     store: Store;
 
     constructor() {
-        this.token = null;
-        this.refreshToken = null;
         this.refreshTimeout = null;
         this.store = store
 
@@ -62,10 +56,8 @@ class AuthService {
             });
 
             const {accessToken, refreshToken, expiresIn, name, surname, email, code, userStatus, roles} = response.data;
-            this.store.dispatch(changeUser({name, surname, email, code, userStatus, roles}));
+            localStorage.setItem("user", JSON.stringify({name, surname, email, code, userStatus, roles}));
 
-            this.token = accessToken;
-            this.refreshToken = refreshToken;
             localStorage.setItem("access_token", accessToken)
             localStorage.setItem("refresh_token", refreshToken)
 
@@ -79,15 +71,13 @@ class AuthService {
 
     async doRefreshToken(): Promise<boolean> {
         try {
+            console.log( localStorage.getItem("refresh_token"))
             let response: AxiosResponse<RefreshResponse>
                 = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/refreshtoken`, {
-                refreshToken: this.refreshToken ? this.refreshToken : localStorage.getItem("refresh_token"),
+                refreshToken: localStorage.getItem("refresh_token"),
             });
 
             const {accessToken, refreshToken, expiresIn} = response.data;
-            console.log(response.data)
-
-            this.token = accessToken;
 
             this.scheduleTokenRefresh(expiresIn);
             localStorage.setItem("access_token", accessToken)
@@ -109,30 +99,22 @@ class AuthService {
 
         this.refreshTimeout = setTimeout(() => {
             this.doRefreshToken();
-            console.log("time");
+            console.log("refreshed");
             localStorage.setItem('tokenRefreshTimeoutDuration', timeoutDuration.toString());
             localStorage.setItem('tokenRefreshTimeoutStartTime', Date.now().toString());
         }, timeoutDuration);
     }
 
     logout = (): void => {
-        this.token = null;
-        this.refreshToken = null;
-
         if (this.refreshTimeout) {
             clearTimeout(this.refreshTimeout);
         }
-        this.store.dispatch(changeUser(null));
+        localStorage.removeItem("user")
 
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('tokenRefreshTimeoutDuration');
         localStorage.removeItem('tokenRefreshTimeoutStartTime');
-    }
-
-
-    getToken(): string | null {
-        return this.token;
     }
 }
 
