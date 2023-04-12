@@ -3,12 +3,12 @@ import mapboxgl, { Map, IControl } from 'mapbox-gl';
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
+import pointService from "../../service/PointService";
 
 
 const MapBox = () => {
     const mapContainer = useRef<HTMLDivElement>(null);
-    // @ts-ignore
-    const [map, setMap] = useState<Map>(null);
+    const [map, setMap] = useState<Map | null>(null);
     const [control, setControl] = useState<IControl | null>(null);
     const mapboxAccessToken = useSelector((state: StoreState) => state.mapboxAccessToken);
     useEffect(() => {
@@ -24,8 +24,16 @@ const MapBox = () => {
             setControl(new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
                 mapboxgl: mapboxgl,
+                language: 'ukr',
                 countries: 'ua'
             }));
+            map.on('moveend', function() {
+                loadPoints(map);
+            });
+            map.on('zoomend', function() {
+                loadPoints(map);
+            });
+
             setMap(map);
         }
     }, [mapboxAccessToken]);
@@ -35,7 +43,19 @@ const MapBox = () => {
             if (control) map.addControl(control);
         }
     }, [map, control]);
-
+    function loadPoints(map:Map) {
+        const bounds = map.getBounds();
+        const zoom = map.getZoom();
+        console.log(bounds.getSouthWest())
+        pointService.getPoints({
+            userId: 1,
+            sw: {lng: bounds.getSouthWest().lng, lat: bounds.getSouthWest().lat},
+            ne: {lng: bounds.getNorthEast().lng, lat: bounds.getNorthEast().lat},
+            zoom: zoom
+        }).then(res=>{
+            console.log(res)
+        })
+    }
     return (
         <div ref={mapContainer} style={{ height: '100vh' }}/>
     );

@@ -12,7 +12,6 @@ import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import {TimePicker} from '@mui/x-date-pickers/TimePicker';
 import {FormGroup, InputLabel} from "@mui/material";
 import Loading from "../../components/Loading";
 import Button from "@mui/material/Button";
@@ -20,6 +19,9 @@ import {makeStyles} from "@material-ui/core/styles";
 import CheckboxResources from "./CheckboxResources"
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxSmall from "../../components/Map/MapboxSmall";
+import Coordinates from "../../model/Coordinates";
+import {useState} from "react";
+import { TimePicker } from '@mui/x-date-pickers';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -33,15 +35,15 @@ const useStyles = makeStyles(() => ({
 export default function CreatingPointPage() {
     const clientId = useSelector((state: StoreState) => state.googleClientId);
     const resources = useSelector((state: StoreState) => state.resources);
+    const [coordinates, setCoordinates] = useState<Coordinates>()
     const classes = useStyles();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        data.append("coordinates", JSON.stringify(coordinates));
+
+        console.log(data);
     };
 
     // const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
@@ -78,7 +80,6 @@ export default function CreatingPointPage() {
                             Створення нового пункту
                         </Typography>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
-                            <div id="map-popup" className="custom-cursor" style={{ height: '400px', width: '100%' }} />
                             <TextField
                                 sx={{mt: 1, mb: 1}}
                                 margin="normal"
@@ -127,26 +128,27 @@ export default function CreatingPointPage() {
                                 <div style={{display: "flex", paddingTop:5}}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <TimePicker
-                                            sx={{m: 0, p: 0}}
+                                            sx={{m: 0, p: 0, width: '50%'}}
+                                            views={['hours', 'minutes']}
+                                            format="HH:mm"
                                             label="Початок"
-                                            views={["hours"]}
-                                            format="hh"
                                         />
                                         <TimePicker
                                             sx={{
                                                 margin: 0,
                                                 p: 0,
-                                                ml: 1
+                                                ml: 1,
+                                                width: '50%'
                                             }}
+                                            views={['hours', 'minutes']}
+                                            format="HH:mm"
                                             label="Завершення"
-                                            views={["hours"]}
-                                            format="hh"
                                         />
                                     </LocalizationProvider>
                                 </div>
                             </FormGroup>
+                            <MapboxSmall setCoordinates={setCoordinates}/>
                             <CheckboxResources resources={resources}/>
-                            <MapboxSmall/>
                             <Button
                                 className={classes.root}
                                 type="submit"
