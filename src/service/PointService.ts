@@ -1,11 +1,9 @@
 import {AppSettings} from "../AppSettings";
 import axios from 'axios';
 import PointRequest from "../model/PointRequest";
-
+import MapPoint from "../model/MapPoint"
 class PointService {
-    async getPoints(pointRequest: PointRequest):Promise<any[]>{
-        console.log(pointRequest)
-
+    async getPoints(pointRequest: PointRequest):Promise<MapPoint[]>{
         let res= await axios.post(`${AppSettings.API_ENDPOINT}/public/point`, pointRequest);
         return res.data;
     }

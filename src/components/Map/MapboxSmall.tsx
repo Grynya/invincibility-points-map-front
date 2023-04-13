@@ -43,8 +43,9 @@ const MapboxSmall: React.FC<Props> = ({ setCoordinates }) => {
                     mapInstance.resize();
                 });
                 mapInstance.on("click", (event) => {
+                    console.log(markerRef.current);
+
                     if (markerRef.current) {
-                        console.log(markerRef.current);
                         markerRef.current.remove(); // Remove the previous marker
                     }
                     markerRef.current = new Marker()
@@ -59,7 +60,6 @@ const MapboxSmall: React.FC<Props> = ({ setCoordinates }) => {
                 });
                 if (controlRef.current && !mapInstance.hasControl(controlRef.current as IControl)) {
                     mapInstance.addControl(controlRef.current);
-                    console.log("added")
                 }
             };
 

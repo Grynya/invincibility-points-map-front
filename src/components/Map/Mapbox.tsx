@@ -1,25 +1,36 @@
-import React, { useRef, useEffect, useState } from 'react';
-import mapboxgl, { Map, IControl } from 'mapbox-gl';
+import React, {useEffect, useRef, useState} from 'react';
+import mapboxgl, {IControl, LngLatLike, Map} from 'mapbox-gl';
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
 import pointService from "../../service/PointService";
+import {Feature, Point} from "geojson";
+import MapPoint from "../../model/MapPoint";
 
+interface Props {
+    setOpenedPoint: React.Dispatch<React.SetStateAction<MapPoint | null>>;
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-const MapBox = () => {
+const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<Map | null>(null);
+    const [currentLocation, setCurrentLocation] = useState<LngLatLike | null>()
     const [control, setControl] = useState<IControl | null>(null);
     const mapboxAccessToken = useSelector((state: StoreState) => state.mapboxAccessToken);
     useEffect(() => {
-        if (mapboxAccessToken && mapContainer.current) {
+        navigator.geolocation.getCurrentPosition(successLocation, errorLocation, {
+            enableHighAccuracy: true
+        });
+        if (mapboxAccessToken && mapContainer.current && currentLocation) {
             mapboxgl.accessToken = mapboxAccessToken
+
             const map = new mapboxgl.Map({
                 container: mapContainer.current,
                 style: 'mapbox://styles/mapbox/streets-v11',
-                center: [49.0139, 31.2858],
+                center: currentLocation,
                 maxBounds: [[22.15, 44.39], [40.22, 52.37]],
-                zoom: 1
+                zoom: 12
             });
             setControl(new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
@@ -27,11 +38,26 @@ const MapBox = () => {
                 language: 'ukr',
                 countries: 'ua'
             }));
-            map.on('moveend', function() {
+            map.on('load', function () {
                 loadPoints(map);
             });
-            map.on('zoomend', function() {
-                loadPoints(map);
+            map.on('moveend', function () {
+                const zoom = map.getZoom();
+                if (zoom >= 8) {
+                    loadPoints(map);
+                } else if (map.getLayer('points')){
+                    map.removeLayer('points');
+                }
+
+            });
+
+            map.on('zoomend', function () {
+                const zoom = map.getZoom();
+                if (zoom >= 8) {
+                    loadPoints(map);
+                } else if (map.getLayer('points')){
+                    map.removeLayer('points');
+                }
             });
 
             setMap(map);
@@ -43,21 +69,108 @@ const MapBox = () => {
             if (control) map.addControl(control);
         }
     }, [map, control]);
-    function loadPoints(map:Map) {
+    function successLocation(position:any) {
+        const { longitude, latitude } = position.coords;
+        setCurrentLocation([longitude, latitude])
+    }
+    function errorLocation() {
+        setCurrentLocation([31.2858, 49.0139])
+    }
+    async function loadPoints(map: Map) {
         const bounds = map.getBounds();
         const zoom = map.getZoom();
-        console.log(bounds.getSouthWest())
-        pointService.getPoints({
+        const points: MapPoint[] = await pointService.getPoints({
             userId: 1,
             sw: {lng: bounds.getSouthWest().lng, lat: bounds.getSouthWest().lat},
             ne: {lng: bounds.getNorthEast().lng, lat: bounds.getNorthEast().lat},
             zoom: zoom
-        }).then(res=>{
-            console.log(res)
         })
+        if (map.getLayer('points')) {
+            map.removeLayer('points');
+        }
+        if (map.getSource('points')) {
+            map.removeSource('points');
+        }
+        if (map) {
+            map.on('click', 'points', function (e) {
+                const features = map.queryRenderedFeatures(e.point, {layers: ['points']});
+                if (!features.length) {
+                    return;
+                }
+                const clickedPoint = features[0].properties;
+                if (clickedPoint) {
+                    setOpenedPoint({
+                        id: clickedPoint.id,
+                        name: clickedPoint.name,
+                        description: clickedPoint.description,
+                        hoursOfWork: clickedPoint.hoursOfWork,
+                        phone: clickedPoint.phone,
+                        coordinates: JSON.parse(clickedPoint.coordinates),
+                        photos: clickedPoint.photos,
+                        resources: clickedPoint.resources
+                    });
+                    setOpen(true);
+                }
+            });
+        }
+
+        const pointsToDraw: Feature<Point>[] = points.map(point => ({
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [point.coordinates.lng, point.coordinates.lat],
+            },
+            properties: {
+                id: point.id,
+                name: point.name,
+                description: point.description,
+                hoursOfWork: point.hoursOfWork,
+                phone: point.phone,
+                coordinates: point.coordinates,
+                photos: point.photos,
+                resources: point.resources
+            },
+        }));
+        map.on('mouseenter', 'points', function (e) {
+            const features = map.queryRenderedFeatures(e.point, { layers: ['points'] });
+            if (!features.length) {
+                return;
+            }
+            map.getCanvas().style.cursor = 'pointer';
+            const hoveredFeature = features[0];
+            if (hoveredFeature && hoveredFeature.properties) {
+                map.setPaintProperty('points', 'circle-color', [
+                    'match',
+                    ['get', 'id'], hoveredFeature.properties.id,
+                    'red',
+                    'blue'
+                ]);
+            }
+        });
+        map.on('mouseleave', 'points', function () {
+            map.getCanvas().style.cursor = '';
+            map.setPaintProperty('points', 'circle-color', 'blue'); // Change this to the normal color
+        });
+        map.addLayer({
+            id: 'points',
+            type: 'circle',
+            source: {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: pointsToDraw
+                }
+            },
+            interactive: true,
+            paint: {
+                'circle-radius': 12,
+                'circle-color': 'blue'
+            }
+        });
     }
+
     return (
-        <div ref={mapContainer} style={{ height: '100vh' }}/>
+        <div ref={mapContainer} style={{height: '100vh'}}/>
     );
 };
 

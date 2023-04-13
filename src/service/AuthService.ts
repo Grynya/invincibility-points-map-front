@@ -2,29 +2,9 @@ import axios, {AxiosResponse} from 'axios';
 import {AppSettings} from "../AppSettings";
 import store from "../store/store"
 import {Store} from 'redux';
-import {EUserStatus} from "../model/EUserStatus";
+import {JwtResponse} from "../payloads/JwtResponse";
+import {JwtRefreshResponse} from "../payloads/JwtRefreshResponse";
 
-interface JwtResponse {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-    type: string;
-    id: number;
-    name: string;
-    surname: string;
-    email: string;
-    code: string;
-    userStatus: EUserStatus;
-    roles: string[];
-
-}
-
-interface RefreshResponse {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-    tokenType: string;
-}
 
 class AuthService {
     refreshTimeout: ReturnType<typeof setTimeout> | null;
@@ -34,14 +14,12 @@ class AuthService {
         this.refreshTimeout = null;
         this.store = store
 
-        // Check if there is a token refresh timeout duration stored in localStorage
         const storedTimeoutDuration = localStorage.getItem('tokenRefreshTimeoutDuration');
         if (storedTimeoutDuration) {
             const remainingTimeoutDuration = parseInt(storedTimeoutDuration) - (Date.now() - parseInt(localStorage.getItem('tokenRefreshTimeoutStartTime')!));
             if (remainingTimeoutDuration > 0) {
                 this.scheduleTokenRefresh(remainingTimeoutDuration);
             }
-            // Clear the stored token refresh timeout duration
             localStorage.removeItem('tokenRefreshTimeoutDuration');
             localStorage.removeItem('tokenRefreshTimeoutStartTime');
         }
@@ -72,7 +50,7 @@ class AuthService {
     async doRefreshToken(): Promise<boolean> {
         try {
             console.log( localStorage.getItem("refresh_token"))
-            let response: AxiosResponse<RefreshResponse>
+            let response: AxiosResponse<JwtRefreshResponse>
                 = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/refreshtoken`, {
                 refreshToken: localStorage.getItem("refresh_token"),
             });
