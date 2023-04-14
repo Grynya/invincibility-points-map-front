@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect, useState} from 'react';
 import Avatar from '@mui/material/Avatar';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -19,9 +20,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import CheckboxResources from "./CheckboxResources"
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxSmall from "../../components/Map/MapboxSmall";
-import Coordinates from "../../model/Coordinates";
-import {useState} from "react";
-import { TimePicker } from '@mui/x-date-pickers';
+import {TimePicker} from '@mui/x-date-pickers';
+import {LngLatLike} from "mapbox-gl";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -35,16 +35,18 @@ const useStyles = makeStyles(() => ({
 export default function CreatingPointPage() {
     const clientId = useSelector((state: StoreState) => state.googleClientId);
     const resources = useSelector((state: StoreState) => state.resources);
-    const [coordinates, setCoordinates] = useState<Coordinates>()
+    const location = useSelector((state: StoreState) => state.location);
+    const [coordinates, setCoordinates] = useState<LngLatLike>();
     const classes = useStyles();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         data.append("coordinates", JSON.stringify(coordinates));
-
-        console.log(data);
     };
+    useEffect(()=>{
+        setCoordinates(location);
+    })
 
     // const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
     //     // if ("profileObj" in res) {
@@ -62,7 +64,7 @@ export default function CreatingPointPage() {
             <>
                 <CssBaseline/>
                 <Header open={false}/>
-                <Container component="main" className="custom-cursor" maxWidth="lg">
+                <Container component="main" className="custom-cursor" maxWidth="xl">
                     <CssBaseline/>
                     <Box
                         component="div"
@@ -113,16 +115,6 @@ export default function CreatingPointPage() {
                                 id="phone"
                                 autoComplete="phone"
                             />
-                            <TextField
-                                sx={{mt: 1, mb: 1}}
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="address"
-                                label="Адреса"
-                                id="address"
-                                autoComplete="address"
-                            />
                             <FormGroup>
                                 <InputLabel>Години роботи</InputLabel>
                                 <div style={{display: "flex", paddingTop:5}}>
@@ -147,7 +139,8 @@ export default function CreatingPointPage() {
                                     </LocalizationProvider>
                                 </div>
                             </FormGroup>
-                            <MapboxSmall setCoordinates={setCoordinates}/>
+
+                            <MapboxSmall coordinates={coordinates} setCoordinates={setCoordinates}/>
                             <CheckboxResources resources={resources}/>
                             <Button
                                 className={classes.root}

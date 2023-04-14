@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import mapboxgl, {IControl, LngLatLike, Map} from 'mapbox-gl';
+import mapboxgl, {IControl, Map} from 'mapbox-gl';
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
@@ -15,20 +15,18 @@ interface Props {
 const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<Map | null>(null);
-    const [currentLocation, setCurrentLocation] = useState<LngLatLike | null>()
     const [control, setControl] = useState<IControl | null>(null);
     const mapboxAccessToken = useSelector((state: StoreState) => state.mapboxAccessToken);
+    const location = useSelector((state: StoreState) => state.location);
     useEffect(() => {
-        navigator.geolocation.getCurrentPosition(successLocation, errorLocation, {
-            enableHighAccuracy: true
-        });
-        if (mapboxAccessToken && mapContainer.current && currentLocation) {
+
+        if (mapboxAccessToken && mapContainer.current) {
             mapboxgl.accessToken = mapboxAccessToken
 
             const map = new mapboxgl.Map({
                 container: mapContainer.current,
                 style: 'mapbox://styles/mapbox/streets-v11',
-                center: currentLocation,
+                center: location,
                 maxBounds: [[22.15, 44.39], [40.22, 52.37]],
                 zoom: 12
             });
@@ -69,13 +67,7 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
             if (control) map.addControl(control);
         }
     }, [map, control]);
-    function successLocation(position:any) {
-        const { longitude, latitude } = position.coords;
-        setCurrentLocation([longitude, latitude])
-    }
-    function errorLocation() {
-        setCurrentLocation([31.2858, 49.0139])
-    }
+
     async function loadPoints(map: Map) {
         const bounds = map.getBounds();
         const zoom = map.getZoom();

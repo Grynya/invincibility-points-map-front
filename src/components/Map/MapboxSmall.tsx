@@ -1,23 +1,42 @@
 import React, {useEffect, useRef, useState} from "react";
-import mapboxgl, {IControl, Map, Marker} from "mapbox-gl";
-import Coordinates from "../../model/Coordinates";
+import mapboxgl, {IControl, LngLatLike, Map, Marker} from "mapbox-gl";
 import {FormGroup, InputLabel} from "@mui/material";
 import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
+import MapboxGeocoding from "@mapbox/mapbox-sdk/services/geocoding";
+
 interface Props {
-    setCoordinates: React.Dispatch<React.SetStateAction<Coordinates | undefined>>;
+    coordinates: LngLatLike|undefined;
+    setCoordinates: React.Dispatch<React.SetStateAction<LngLatLike|undefined>>;
 }
 
-const MapboxSmall: React.FC<Props> = ({ setCoordinates }) => {
+const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const [map, setMap] = useState<Map | null>(null);
     const markerRef = useRef<Marker | null>(null);
     const mapboxAccessToken = useSelector((state: StoreState) => state.mapboxAccessToken);
     const controlRef = useRef<IControl | null>(null);
+    const [addressString, setAddressString] = useState<String | null>(null);
+    // const location = useSelector((state: StoreState) => state.location);
+
+    const getAddress = async (lngLat: LngLatLike) => {
+        const geocodingClient = MapboxGeocoding({accessToken: mapboxAccessToken});
+        if (lngLat) {
+            if (lngLat instanceof mapboxgl.LngLat) {
+                const response = await geocodingClient.reverseGeocode({
+                    query: [lngLat.lng, lngLat.lat],
+                    types: ["address"],
+                    limit: 1,
+                }).send();
+                (response.body.features.length > 0) ?
+                    setAddressString(response.body.features[0].place_name) : setAddressString(null);
+            }
+        }
+    }
 
     useEffect(() => {
-        if (mapboxAccessToken) {
+        if (mapboxAccessToken && coordinates) {
             mapboxgl.accessToken = mapboxAccessToken
 
             const initializeMap = ({
@@ -30,34 +49,39 @@ const MapboxSmall: React.FC<Props> = ({ setCoordinates }) => {
                 const mapInstance = new mapboxgl.Map({
                     container: mapContainer.current as HTMLDivElement,
                     style: "mapbox://styles/mapbox/streets-v11",
-                    center: [49.0139, 31.2858],
+                    center: coordinates,
                     maxBounds: [
                         [22.15, 44.39],
                         [40.22, 52.37],
                     ],
-                    zoom: 2,
+                    zoom: 12,
                 });
 
                 mapInstance.on("load", () => {
                     setMap(mapInstance);
                     mapInstance.resize();
-                });
-                mapInstance.on("click", (event) => {
-                    console.log(markerRef.current);
+                    markerRef.current = new mapboxgl.Marker({
+                        draggable: true
+                    })
+                        .setLngLat(coordinates)
+                        .addTo(mapInstance);
 
-                    if (markerRef.current) {
-                        markerRef.current.remove(); // Remove the previous marker
-                    }
-                    markerRef.current = new Marker()
-                        .setLngLat(event.lngLat)
-                        .addTo(mapInstance); // Update the marker ref
-                    setCoordinates({lat: event.lngLat.lat, lng: event.lngLat.lng})
+                    setCoordinates(markerRef.current!.getLngLat());
+                    getAddress(markerRef.current!.getLngLat());
+
+                    markerRef.current.on("dragend", async () => {
+                        const lngLat: LngLatLike = markerRef.current!.getLngLat();
+                        setCoordinates(lngLat);
+                        getAddress(lngLat);
+                    });
                 });
+
                 controlRef.current = new MapboxGeocoder({
                     accessToken: mapboxgl.accessToken,
                     mapboxgl: mapboxgl,
                     countries: 'ua',
                 });
+
                 if (controlRef.current && !mapInstance.hasControl(controlRef.current as IControl)) {
                     mapInstance.addControl(controlRef.current);
                 }
@@ -67,14 +91,13 @@ const MapboxSmall: React.FC<Props> = ({ setCoordinates }) => {
         }
     }, [map, mapboxAccessToken, setCoordinates]);
 
-
     return (
-        <FormGroup sx={{mt: 3, mb: 1}}>
-            <InputLabel>Адреса</InputLabel>
-        <div
-            ref={(el) => (mapContainer.current = el)}
-            style={{ width: "100%", height: "30vh" }}
-        ></div>
+        <FormGroup sx={{mt: 1, mb: 1}}>
+            <InputLabel sx={{mt: 1, mb: 1}}>Адреса: {addressString}</InputLabel>
+            <div
+                ref={(el) => (mapContainer.current = el)}
+                style={{width: "100%", height: "30vh"}}
+            ></div>
         </FormGroup>
     );
 };

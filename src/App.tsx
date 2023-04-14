@@ -13,10 +13,18 @@ import Keys from "./model/Keys";
 import CreatingPointPage from "./views/creatingPoint/CreatingPointPage";
 import {changeResources} from "./store/actionCreators/changeResources";
 import {ResourceService} from "./service/ResourceService";
+import {changeLocation} from "./store/actionCreators/changeLocation";
 
 export default function App() {
     const dispatch = useDispatch();
 
+    function successLocation(position:any) {
+        const { longitude, latitude } = position.coords;
+        dispatch(changeLocation([longitude, latitude]))
+    }
+    function errorLocation() {
+        console.log("Unable to get current location.")
+    }
     useEffect(() => {
         const fetchData = async () => {
             const data: Keys = await new KeyService().getKeys();
@@ -26,6 +34,9 @@ export default function App() {
             dispatch(changeResources(resources));
         };
         fetchData();
+        navigator.geolocation.getCurrentPosition(successLocation, errorLocation, {
+            enableHighAccuracy: true
+        });
     });
     return (
         <ProfileProvider>
