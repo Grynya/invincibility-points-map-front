@@ -18,7 +18,6 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
     const mapboxAccessToken = useSelector((state: StoreState) => state.mapboxAccessToken);
     const controlRef = useRef<IControl | null>(null);
     const [addressString, setAddressString] = useState<String | null>(null);
-    // const location = useSelector((state: StoreState) => state.location);
 
     const getAddress = async (lngLat: LngLatLike) => {
         const geocodingClient = MapboxGeocoding({accessToken: mapboxAccessToken});
@@ -69,7 +68,7 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
                     setCoordinates(markerRef.current!.getLngLat());
                     getAddress(markerRef.current!.getLngLat());
 
-                    markerRef.current.on("dragend", async () => {
+                    markerRef.current.on("dragend", () => {
                         const lngLat: LngLatLike = markerRef.current!.getLngLat();
                         setCoordinates(lngLat);
                         getAddress(lngLat);
@@ -80,8 +79,16 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
                     accessToken: mapboxgl.accessToken,
                     mapboxgl: mapboxgl,
                     countries: 'ua',
+                    marker: false
                 });
-
+                // @ts-ignore
+                controlRef.current.on('result', e => {
+                    markerRef.current?.setLngLat(e.result.center);
+                    getAddress(markerRef.current!.getLngLat());
+                });
+                if (controlRef.current && !mapInstance.hasControl(controlRef.current as IControl)) {
+                    mapInstance.addControl(controlRef.current);
+                }
                 if (controlRef.current && !mapInstance.hasControl(controlRef.current as IControl)) {
                     mapInstance.addControl(controlRef.current);
                 }
