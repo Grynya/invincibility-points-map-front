@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import mapboxgl, {IControl, LngLatLike, Map, Marker} from "mapbox-gl";
-import {FormGroup, InputLabel} from "@mui/material";
+import {InputLabel} from "@mui/material";
 import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
@@ -99,13 +99,13 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
     }, [map, mapboxAccessToken, setCoordinates]);
 
     return (
-        <FormGroup sx={{mt: 1, mb: 1}}>
+        <div style={{margin: '1px 0'}}>
             <InputLabel sx={{mt: 1, mb: 1}}>Адреса: {addressString}</InputLabel>
             <div
                 ref={(el) => (mapContainer.current = el)}
-                style={{width: "100%", height: "30vh"}}
+                style={{width: "100%", height: "50vh"}}
             ></div>
-        </FormGroup>
+        </div>
     );
 };
 

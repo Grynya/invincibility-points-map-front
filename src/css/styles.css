@@ -64,8 +64,12 @@ body {
 .contained-btn{
     padding: 6px 16px !important;
     color: #ffffff;
-
 }
 body {
     overflow: auto; /* This will add scrolling if the content overflows the element */
+}
+input#input-file-upload-button{
+    margin-left: 150px !important;
+    color: #D70040 !important;
+    display: none;
 }

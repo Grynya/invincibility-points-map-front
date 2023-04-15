@@ -3,8 +3,30 @@ import {Checkbox, FormControlLabel, FormGroup, InputLabel, List, ListItem} from 
 import Tooltip from "@mui/material/Tooltip";
 import HelpIcon from "@mui/icons-material/Help";
 import * as React from "react";
+import {useState} from 'react';
+import {Typography} from "@material-ui/core";
 
-export default function CheckboxResources ({resources}: { resources: Resource[] | null }) {
+export default function CheckboxResources({
+                                              resources,
+                                              selectedResources,
+                                              setSelectedResources
+                                          }: { resources: Resource[] | null, selectedResources: Resource[],
+    setSelectedResources: (resources: Resource[]) => void }) {
+    const [warning, setWarning] = useState<string | null>(null);
+
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, resource: Resource) => {
+        if (event.target.checked) {
+            setSelectedResources([...selectedResources, resource]);
+        } else {
+            const newSelectedResources = selectedResources.filter((r) => r.id !== resource.id);
+            if (newSelectedResources.length === 0) {
+                setWarning('Потрібно вибрати принаймні один ресурс');
+                return;
+            }
+            setSelectedResources(newSelectedResources);
+        }
+        setWarning(null);
+    };
 
     if (resources !== null)
         return (
@@ -14,22 +36,25 @@ export default function CheckboxResources ({resources}: { resources: Resource[] 
                     {resources.map((resource: Resource) => {
                         return (
                             <ListItem key={resource.id}>
-                                <Tooltip title={resource.description}>
-                                    <FormControlLabel
-                                        key={resource.id}
-                                        control={<Checkbox/>}
-                                        label={
-                                            <>
-                                                {resource.name}
+                                <FormControlLabel
+                                    key={resource.id}
+                                    control={<Checkbox
+                                        checked={selectedResources.some((r) => r.id === resource.id)}
+                                        onChange={(event) => handleCheckboxChange(event, resource)}/>}
+                                    label={
+                                        <>
+                                            {resource.name}
+                                            <Tooltip title={resource.description}>
                                                 <HelpIcon sx={{fontSize: 'small', ml: 1}}/>
-                                            </>
-                                        }
-                                    />
-                                </Tooltip>
+                                            </Tooltip>
+                                        </>
+                                    }
+                                />
                             </ListItem>
                         )
                     })}
                 </List>
+                {warning && <Typography color="error">{warning}</Typography>}
             </FormGroup>
         )
     else return null

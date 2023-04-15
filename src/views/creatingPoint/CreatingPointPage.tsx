@@ -22,6 +22,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import MapboxSmall from "../../components/Map/MapboxSmall";
 import {TimePicker} from '@mui/x-date-pickers';
 import {LngLatLike} from "mapbox-gl";
+import Resource from "../../model/Resource";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -37,27 +38,38 @@ export default function CreatingPointPage() {
     const resources = useSelector((state: StoreState) => state.resources);
     const location = useSelector((state: StoreState) => state.location);
     const [coordinates, setCoordinates] = useState<LngLatLike>();
+    const [selectedResources, setSelectedResources] = useState<Resource[]>([]);
+    const [files, setFiles] = useState<File[]>([]);
     const classes = useStyles();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
         data.append("coordinates", JSON.stringify(coordinates));
-    };
-    useEffect(()=>{
-        setCoordinates(location);
-    })
+        data.append("resources", JSON.stringify(selectedResources));
+        for (let i = 0; i < files.length; i++) {
+            data.append('photos', files[i]);
+        }
+        // @ts-ignore
+        for (const [key, value] of data) {
+            console.log(`${key}: ${value}`);
+        }
 
-    // const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
-    //     // if ("profileObj" in res) {
-    //     //     setProfile(res.profileObj);
-    //     // }
-    //     // navigate('/');
-    // };
-    //
-    // const onFailure = (err: any) => {
-    //     console.log('failed', err);
-    // };
+    };
+    const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const inputFiles = event.target.files;
+        if (inputFiles) {
+            const newFile = inputFiles[0];
+
+            const fileWithRealName = new File([newFile], newFile.name, {type: newFile.type});
+
+            const newFiles = [...files.slice(0, 1), fileWithRealName, ...files.slice(1)];
+
+            setFiles(newFiles);
+        }
+    };
+
+    useEffect(() => setCoordinates(location), [location]);
 
     return (
         clientId === null || resources === null ? <Loading/> :
@@ -66,9 +78,8 @@ export default function CreatingPointPage() {
                 <Header open={false}/>
                 <Container component="main" className="custom-cursor" maxWidth="xl">
                     <CssBaseline/>
-                    <Box
-                        component="div"
-                        sx={{
+                    <div
+                        style={{
                             marginTop: 8,
                             display: 'flex',
                             flexDirection: 'column',
@@ -115,9 +126,9 @@ export default function CreatingPointPage() {
                                 id="phone"
                                 autoComplete="phone"
                             />
-                            <FormGroup>
+                            <FormGroup sx={{mt: 1, mb: 1}}>
                                 <InputLabel>Години роботи</InputLabel>
-                                <div style={{display: "flex", paddingTop:5}}>
+                                <div style={{display: "flex", paddingTop: 6}}>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <TimePicker
                                             sx={{m: 0, p: 0, width: '50%'}}
@@ -139,9 +150,28 @@ export default function CreatingPointPage() {
                                     </LocalizationProvider>
                                 </div>
                             </FormGroup>
+                            <input type="file" id="photo" onChange={handleFileInputChange} multiple/>
 
-                            <MapboxSmall coordinates={coordinates} setCoordinates={setCoordinates}/>
-                            <CheckboxResources resources={resources}/>
+                            {/*<FormGroup sx={{mt: 1, mb: 1}}>*/}
+                            {/*    <InputLabel>Фото</InputLabel>*/}
+                            {/*    <TextField*/}
+                            {/*        sx={{p: 0, m: 0}}*/}
+                            {/*        margin="normal"*/}
+                            {/*        fullWidth*/}
+                            {/*        type="file"*/}
+                            {/*        name="photo"*/}
+                            {/*        id="photo"*/}
+                            {/*        inputProps={{*/}
+                            {/*            accept: 'image/jpeg, image/png, image/gif',*/}
+                            {/*            multiple: true*/}
+                            {/*        }}*/}
+                            {/*    />*/}
+                            {/*</FormGroup>*/}
+                            <CheckboxResources resources={resources}
+                                               selectedResources={selectedResources}
+                                               setSelectedResources={setSelectedResources}/>
+                            <MapboxSmall coordinates={coordinates}
+                                         setCoordinates={setCoordinates}/>
                             <Button
                                 className={classes.root}
                                 type="submit"
@@ -153,7 +183,8 @@ export default function CreatingPointPage() {
                                 Додати пункт
                             </Button>
                         </Box>
-                    </Box>
+                    </div>
+
                     <Copyright sx={{mt: 8, mb: 4}}/>
                 </Container>
             </>
