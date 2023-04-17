@@ -23,6 +23,11 @@ import MapboxSmall from "../../components/Map/MapboxSmall";
 import {TimePicker} from '@mui/x-date-pickers';
 import {LngLatLike} from "mapbox-gl";
 import Resource from "../../model/Resource";
+import User from "../../model/User";
+import pointService from "../../service/PointService";
+import CreatePointRequest from "../../payloads/request/CreatePointRequest";
+import HoursOfWork from "../../model/HoursOfWork";
+import {PickerChangeHandler} from "@mui/x-date-pickers/internals/hooks/usePicker/usePickerValue";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -33,28 +38,52 @@ const useStyles = makeStyles(() => ({
         },
     },
 }));
+
 export default function CreatingPointPage() {
     const clientId = useSelector((state: StoreState) => state.googleClientId);
     const resources = useSelector((state: StoreState) => state.resources);
     const location = useSelector((state: StoreState) => state.location);
     const [coordinates, setCoordinates] = useState<LngLatLike>();
+    const [hoursOfWork, setHoursOfWork] = useState<HoursOfWork>(new HoursOfWork("", ""));
     const [selectedResources, setSelectedResources] = useState<Resource[]>([]);
-    const [files, setFiles] = useState<File[]>([]);
+    const [photos, setPhotos] = useState<File[]>([]);
     const classes = useStyles();
+    const [error, setError] = useState({message: "", visible: false});
+    const [startTime, setStartTime] = useState<string>("");
+    const [endTime, setEndTime] = useState<Date | null>(new Date());
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const [formData, setFormData] = useState<CreatePointRequest>({
+        name: "",
+        description: "",
+        phone: "",
+        userId: 1, //todo:profile.id
+        photos: photos,
+        coordinates: location,
+        hoursOfWork: HoursOfWork.split(hoursOfWork),
+        resources: selectedResources,
+    });
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        data.append("coordinates", JSON.stringify(coordinates));
-        data.append("resources", JSON.stringify(selectedResources));
-        for (let i = 0; i < files.length; i++) {
-            data.append('photos', files[i]);
-        }
+        // const data = new FormData(event.currentTarget);
+        // data.append("coordinates", JSON.stringify(coordinates));
+        // data.append("resources", JSON.stringify(selectedResources));
+        // const user: User = JSON.parse(localStorage.getItem('user')!);
+        // data.append('userId', user?.id.toString())
+        // for (let i = 0; i < photos.length; i++) {
+        //     data.append('photos', photos[i]);
+        // }
         // @ts-ignore
-        for (const [key, value] of data) {
-            console.log(`${key}: ${value}`);
-        }
-
+        // for (const [key, value] of data) {
+        //     console.log(`${key}: ${value}`);
+        // }
+        console.log(formData)
+        // await pointService.createPoint(data)
+    };
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.value,
+        });
     };
     const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const inputFiles = event.target.files;
@@ -63,9 +92,9 @@ export default function CreatingPointPage() {
 
             const fileWithRealName = new File([newFile], newFile.name, {type: newFile.type});
 
-            const newFiles = [...files.slice(0, 1), fileWithRealName, ...files.slice(1)];
+            const newFiles = [...photos.slice(0, 1), fileWithRealName, ...photos.slice(1)];
 
-            setFiles(newFiles);
+            setPhotos(newFiles);
         }
     };
 
@@ -102,6 +131,7 @@ export default function CreatingPointPage() {
                                 label="Назва"
                                 name="name"
                                 autoComplete="name"
+                                onChange={handleInputChange}
                                 autoFocus
                             />
                             <TextField
@@ -115,6 +145,7 @@ export default function CreatingPointPage() {
                                 label="Опис"
                                 id="description"
                                 autoComplete="description"
+                                onChange={handleInputChange}
                             />
                             <TextField
                                 sx={{mt: 1, mb: 1}}
@@ -125,6 +156,7 @@ export default function CreatingPointPage() {
                                 label="Телефон"
                                 id="phone"
                                 autoComplete="phone"
+                                onChange={handleInputChange}
                             />
                             <FormGroup sx={{mt: 1, mb: 1}}>
                                 <InputLabel>Години роботи</InputLabel>
@@ -135,6 +167,12 @@ export default function CreatingPointPage() {
                                             views={['hours', 'minutes']}
                                             format="HH:mm"
                                             label="Початок"
+                                            onChange={(event: string):PickerChangeHandler<any, any> =>{
+                                                if (event){
+                                                    setStartTime(event)
+                                                }
+                                            }
+                                            }
                                         />
                                         <TimePicker
                                             sx={{
@@ -146,11 +184,21 @@ export default function CreatingPointPage() {
                                             views={['hours', 'minutes']}
                                             format="HH:mm"
                                             label="Завершення"
+                                            onChange={(event: React.ChangeEvent<HTMLInputElement> | null) =>{
+                                                const how = hoursOfWork;
+                                                if (event) {
+                                                    how.endTime = event.target.value
+                                                    setHoursOfWork(how);
+                                                }
+                                            }
+                                            }
                                         />
                                     </LocalizationProvider>
                                 </div>
                             </FormGroup>
-                            <input type="file" id="photo" onChange={handleFileInputChange} multiple/>
+                            <input type="file" id="photo"
+                                   accept="image/png, image/jpeg, image/gif"
+                                   onChange={handleFileInputChange} multiple/>
 
                             {/*<FormGroup sx={{mt: 1, mb: 1}}>*/}
                             {/*    <InputLabel>Фото</InputLabel>*/}

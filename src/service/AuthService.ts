@@ -2,8 +2,8 @@ import axios, {AxiosResponse} from 'axios';
 import {AppSettings} from "../AppSettings";
 import store from "../store/store"
 import {Store} from 'redux';
-import {JwtResponse} from "../payloads/JwtResponse";
-import {JwtRefreshResponse} from "../payloads/JwtRefreshResponse";
+import {JwtResponse} from "../payloads/response/JwtResponse";
+import {JwtRefreshResponse} from "../payloads/response/JwtRefreshResponse";
 
 
 class AuthService {
@@ -25,7 +25,7 @@ class AuthService {
         }
     }
 
-    async login(username: string, password: string): Promise<boolean> {
+    async login(username: string, password: string, onFailure: (error: any)=>void): Promise<boolean | undefined> {
         try {
 
             const response: AxiosResponse<JwtResponse> = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/signin`, {
@@ -43,7 +43,7 @@ class AuthService {
 
             return true;
         } catch (error) {
-            throw new Error(`Authentication failed:${error}`)
+            onFailure(error)
         }
     }
 

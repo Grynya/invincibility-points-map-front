@@ -1,4 +1,4 @@
-import Coordinates from "./Coordinates";
+import Coordinates from "../../model/Coordinates";
 
 export default interface PointRequest {
     sw: Coordinates;

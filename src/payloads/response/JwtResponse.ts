@@ -1,4 +1,4 @@
-import {EUserStatus} from "../model/EUserStatus";
+import {EUserStatus} from "../../model/EUserStatus";
 
 export interface JwtResponse {
     accessToken: string;

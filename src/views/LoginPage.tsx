@@ -20,26 +20,24 @@ import {useSelector} from "react-redux";
 import {StoreState} from "../store/StoreState";
 import AuthService from "../service/AuthService";
 import ErrorAlert from "../components/alerts/ErrorAlert";
+
 export default function LoginPage() {
     const {setProfile} = useContext(ProfileContext);
     const navigate = useNavigate();
     const clientId = useSelector((state: StoreState) => state.googleClientId);
     const [error, setError] = useState({message: "", visible: false});
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        try {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const username = formData.get('email')?.toString();
-            const password = formData.get('password')?.toString();
-            if (username !== undefined && password !== undefined) {
-                await AuthService.login(username, password)
-                navigate("/");
-            } else throw new Error ("Empty email or data")
-        }catch (error) {
-            if (error instanceof Error) {
-                setError({message: error.message, visible: true});
-            }
-        }
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
+        const username = formData.get('email')?.toString();
+        const password = formData.get('password')?.toString();
+        if (username !== undefined && password !== undefined) {
+            await AuthService.login(username, password, (error) => {
+                if (error instanceof Error)
+                    setError({message: error.message, visible: true});
+            })
+            navigate("/");
+        } else setError({message: "No username or password", visible: true});
     }
     const onSuccess = (res: GoogleLoginResponse | GoogleLoginResponseOffline) => {
         if ("profileObj" in res) {
