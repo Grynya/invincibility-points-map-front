@@ -27,7 +27,6 @@ class AuthService {
 
     async login(username: string, password: string, onFailure: (error: any)=>void): Promise<boolean | undefined> {
         try {
-
             const response: AxiosResponse<JwtResponse> = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/signin`, {
                 username,
                 password,

@@ -7,8 +7,8 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import MapboxGeocoding from "@mapbox/mapbox-sdk/services/geocoding";
 
 interface Props {
-    coordinates: LngLatLike|undefined;
-    setCoordinates: React.Dispatch<React.SetStateAction<LngLatLike|undefined>>;
+    coordinates: LngLatLike | undefined;
+    setCoordinates: React.Dispatch<React.SetStateAction<LngLatLike | undefined>>;
 }
 
 const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
@@ -19,18 +19,17 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
     const controlRef = useRef<IControl | null>(null);
     const [addressString, setAddressString] = useState<String | null>(null);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const getAddress = async (lngLat: LngLatLike) => {
         const geocodingClient = MapboxGeocoding({accessToken: mapboxAccessToken});
-        if (lngLat) {
-            if (lngLat instanceof mapboxgl.LngLat) {
-                const response = await geocodingClient.reverseGeocode({
-                    query: [lngLat.lng, lngLat.lat],
-                    types: ["address"],
-                    limit: 1,
-                }).send();
-                (response.body.features.length > 0) ?
-                    setAddressString(response.body.features[0].place_name) : setAddressString(null);
-            }
+        if (lngLat && lngLat instanceof mapboxgl.LngLat) {
+            const response = await geocodingClient.reverseGeocode({
+                query: [lngLat.lng, lngLat.lat],
+                types: ["address"],
+                limit: 1,
+            }).send();
+            (response.body.features.length > 0) ?
+                setAddressString(response.body.features[0].place_name) : setAddressString(null);
         }
     }
 
@@ -70,7 +69,7 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
 
                     markerRef.current.on("dragend", () => {
                         const lngLat: LngLatLike = markerRef.current!.getLngLat();
-                        setCoordinates(lngLat);
+                        setCoordinates({lat: lngLat.lat, lng: lngLat.lng});
                         getAddress(lngLat);
                     });
                 });
@@ -96,11 +95,11 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
 
             if (!map) initializeMap({setMap, mapContainer});
         }
-    }, [map, mapboxAccessToken, setCoordinates]);
+    }, [coordinates, getAddress, map, mapboxAccessToken, setCoordinates]);
 
     return (
         <div style={{margin: '1px 0'}}>
-            <InputLabel sx={{mt: 1, mb: 1}}>Адреса: {addressString}</InputLabel>
+            <InputLabel sx={{mt: 1, mb: 1, fontWeight:"bold", color: "#000000"}}>Обрана адреса: {addressString}</InputLabel>
             <div
                 ref={(el) => (mapContainer.current = el)}
                 style={{width: "100%", height: "50vh"}}

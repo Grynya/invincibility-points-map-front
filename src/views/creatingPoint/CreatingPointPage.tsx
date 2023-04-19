@@ -23,11 +23,10 @@ import MapboxSmall from "../../components/Map/MapboxSmall";
 import {TimePicker} from '@mui/x-date-pickers';
 import {LngLatLike} from "mapbox-gl";
 import Resource from "../../model/Resource";
-import User from "../../model/User";
-import pointService from "../../service/PointService";
 import CreatePointRequest from "../../payloads/request/CreatePointRequest";
-import HoursOfWork from "../../model/HoursOfWork";
-import {PickerChangeHandler} from "@mui/x-date-pickers/internals/hooks/usePicker/usePickerValue";
+import dayjs, {Dayjs} from "dayjs";
+import ErrorAlert from "../../components/alerts/ErrorAlert";
+import pointService from "../../service/PointService";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -42,43 +41,60 @@ const useStyles = makeStyles(() => ({
 export default function CreatingPointPage() {
     const clientId = useSelector((state: StoreState) => state.googleClientId);
     const resources = useSelector((state: StoreState) => state.resources);
-    const location = useSelector((state: StoreState) => state.location);
+    const location:LngLatLike = useSelector((state: StoreState) => state.location);
     const [coordinates, setCoordinates] = useState<LngLatLike>();
-    const [hoursOfWork, setHoursOfWork] = useState<HoursOfWork>(new HoursOfWork("", ""));
     const [selectedResources, setSelectedResources] = useState<Resource[]>([]);
-    const [photos, setPhotos] = useState<File[]>([]);
+    const [photos, setPhotos] = useState<FileList|null>(null);
     const classes = useStyles();
     const [error, setError] = useState({message: "", visible: false});
-    const [startTime, setStartTime] = useState<string>("");
-    const [endTime, setEndTime] = useState<Date | null>(new Date());
+
+    const [startDate, setStartDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'));
+    const [endDate, setEndDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'))
 
     const [formData, setFormData] = useState<CreatePointRequest>({
         name: "",
         description: "",
         phone: "",
         userId: 1, //todo:profile.id
-        photos: photos,
         coordinates: location,
-        hoursOfWork: HoursOfWork.split(hoursOfWork),
+        hoursOfWork: startDate.format("HH:mm") + '-' + endDate.format("HH:mm"),
         resources: selectedResources,
     });
+    const isDisabledSubmitButton = (): boolean => formData.name === "" || formData.phone === "" || formData.userId === null
+        || coordinates === null || false || formData.resources.length < 1
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // const data = new FormData(event.currentTarget);
-        // data.append("coordinates", JSON.stringify(coordinates));
-        // data.append("resources", JSON.stringify(selectedResources));
-        // const user: User = JSON.parse(localStorage.getItem('user')!);
-        // data.append('userId', user?.id.toString())
-        // for (let i = 0; i < photos.length; i++) {
-        //     data.append('photos', photos[i]);
-        // }
-        // @ts-ignore
-        // for (const [key, value] of data) {
-        //     console.log(`${key}: ${value}`);
-        // }
         console.log(formData)
-        // await pointService.createPoint(data)
+        await pointService.createPoint(formData, photos,()=>{
+            console.log("Added mapPoint")
+        },(error) => {
+            if (error instanceof Error)
+                setError({message: error.message, visible: true});
+        });
     };
+
+    useEffect(() => {
+        setFormData({
+            ...formData,
+            hoursOfWork: startDate.format("HH:mm") + '-' + endDate.format("HH:mm"),
+        });
+    }, [startDate, endDate]);
+    useEffect(() => {
+        setFormData({
+            ...formData,
+            resources: selectedResources,
+        });
+    }, [selectedResources]);
+    useEffect(()=>{
+        if (coordinates) {
+            setFormData({
+                ...formData,
+                coordinates: coordinates,
+            });
+        }
+    },[coordinates])
+
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
             ...formData,
@@ -86,18 +102,8 @@ export default function CreatingPointPage() {
         });
     };
     const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const inputFiles = event.target.files;
-        if (inputFiles) {
-            const newFile = inputFiles[0];
-
-            const fileWithRealName = new File([newFile], newFile.name, {type: newFile.type});
-
-            const newFiles = [...photos.slice(0, 1), fileWithRealName, ...photos.slice(1)];
-
-            setPhotos(newFiles);
-        }
-    };
-
+        if (event.target.files) setPhotos(event.target.files)
+    }
     useEffect(() => setCoordinates(location), [location]);
 
     return (
@@ -122,6 +128,7 @@ export default function CreatingPointPage() {
                             Створення нового пункту
                         </Typography>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
+                            <ErrorAlert error={error} setError={setError}/>
                             <TextField
                                 sx={{mt: 1, mb: 1}}
                                 margin="normal"
@@ -166,13 +173,11 @@ export default function CreatingPointPage() {
                                             sx={{m: 0, p: 0, width: '50%'}}
                                             views={['hours', 'minutes']}
                                             format="HH:mm"
+                                            value={startDate}
                                             label="Початок"
-                                            onChange={(event: string):PickerChangeHandler<any, any> =>{
-                                                if (event){
-                                                    setStartTime(event)
-                                                }
-                                            }
-                                            }
+                                            onChange={(newValue) => {
+                                                if (newValue) setStartDate(newValue)
+                                            }}
                                         />
                                         <TimePicker
                                             sx={{
@@ -183,38 +188,39 @@ export default function CreatingPointPage() {
                                             }}
                                             views={['hours', 'minutes']}
                                             format="HH:mm"
+                                            value={endDate}
                                             label="Завершення"
-                                            onChange={(event: React.ChangeEvent<HTMLInputElement> | null) =>{
-                                                const how = hoursOfWork;
-                                                if (event) {
-                                                    how.endTime = event.target.value
-                                                    setHoursOfWork(how);
-                                                }
-                                            }
-                                            }
+                                            onChange={(newValue) => {
+                                                if (newValue) setEndDate(newValue)
+                                            }}
                                         />
                                     </LocalizationProvider>
                                 </div>
                             </FormGroup>
-                            <input type="file" id="photo"
-                                   accept="image/png, image/jpeg, image/gif"
-                                   onChange={handleFileInputChange} multiple/>
-
-                            {/*<FormGroup sx={{mt: 1, mb: 1}}>*/}
-                            {/*    <InputLabel>Фото</InputLabel>*/}
-                            {/*    <TextField*/}
-                            {/*        sx={{p: 0, m: 0}}*/}
-                            {/*        margin="normal"*/}
-                            {/*        fullWidth*/}
-                            {/*        type="file"*/}
-                            {/*        name="photo"*/}
-                            {/*        id="photo"*/}
-                            {/*        inputProps={{*/}
-                            {/*            accept: 'image/jpeg, image/png, image/gif',*/}
-                            {/*            multiple: true*/}
-                            {/*        }}*/}
-                            {/*    />*/}
-                            {/*</FormGroup>*/}
+                            <FormGroup sx={{mt: 1, mb: 1}}>
+                                <InputLabel>Фото</InputLabel>
+                                {/*<TextField*/}
+                                {/*    sx={{p: 0, m: 0}}*/}
+                                {/*    margin="normal"*/}
+                                {/*    fullWidth*/}
+                                {/*    type="file"*/}
+                                {/*    name="photo"*/}
+                                {/*    id="photo"*/}
+                                {/*    onChange={handleFileInputChange}*/}
+                                {/*    inputProps={{*/}
+                                {/*        accept: 'image/jpeg, image/png, image/gif',*/}
+                                {/*        multiple: true*/}
+                                {/*    }}*/}
+                                {/*/>*/}
+                                <input
+                                    type="file"
+                                    name="photo"
+                                    id="photo"
+                                    onChange={handleFileInputChange}
+                                    accept='image/jpeg, image/png, image/gif'
+                                    multiple
+                                />
+                            </FormGroup>
                             <CheckboxResources resources={resources}
                                                selectedResources={selectedResources}
                                                setSelectedResources={setSelectedResources}/>
@@ -223,6 +229,7 @@ export default function CreatingPointPage() {
                             <Button
                                 className={classes.root}
                                 type="submit"
+                                disabled={isDisabledSubmitButton()}
                                 fullWidth
                                 variant="contained"
                                 color="primary"
@@ -232,7 +239,6 @@ export default function CreatingPointPage() {
                             </Button>
                         </Box>
                     </div>
-
                     <Copyright sx={{mt: 8, mb: 4}}/>
                 </Container>
             </>

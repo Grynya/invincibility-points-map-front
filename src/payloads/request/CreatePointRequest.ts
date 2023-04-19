@@ -1,5 +1,5 @@
-import {LngLatLike} from "mapbox-gl";
 import Resource from "../../model/Resource";
+import {LngLatLike} from "mapbox-gl";
 
 export default interface CreatePointRequest {
     name: string;
@@ -7,7 +7,6 @@ export default interface CreatePointRequest {
     phone: string;
     hoursOfWork: string;
     coordinates: LngLatLike;
-    photos: File[];
     resources: Resource[];
     userId: number;
 }
