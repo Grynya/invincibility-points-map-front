@@ -10,7 +10,7 @@ import {changeMapboxAccessToken} from "./store/actionCreators/changeMapboxAccess
 import {changeGoogleClientId} from "./store/actionCreators/changeGoogleClientId";
 import {KeyService} from "./service/KeyService";
 import Keys from "./model/Keys";
-import CreatingPointPage from "./views/creatingPoint/CreatingPointPage";
+import CreatingPointPage from "./views/CreatingPointPage";
 import {changeResources} from "./store/actionCreators/changeResources";
 import {ResourceService} from "./service/ResourceService";
 import {changeLocation} from "./store/actionCreators/changeLocation";

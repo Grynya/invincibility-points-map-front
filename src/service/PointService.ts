@@ -8,8 +8,7 @@ import photoService from "./PhotoService";
 
 class PointService {
     async getPoints(pointRequest: PointRequest): Promise<MapPoint[]> {
-        let res = await axios.post(`${AppSettings.API_ENDPOINT}/public/point/getAll`, pointRequest);
-        return res.data;
+        return (await axios.post(`${AppSettings.API_ENDPOINT}/public/point/getAll`, pointRequest)).data;
     }
 
     async createPoint(createPointRequest: CreatePointRequest, photos: FileList | null, onSuccess: () => void, onFailure: (error: any) => void): Promise<void> {
@@ -17,13 +16,14 @@ class PointService {
             let createPointResponse: CreatePointResponse = await axios.post(`${AppSettings.API_ENDPOINT}/point`, createPointRequest);
             console.log(createPointResponse)
             const dataToSavePhotos = new FormData();
-            dataToSavePhotos.append("mapPointId", createPointResponse.body.mapPointId)
+            dataToSavePhotos.append("mapPointId", createPointResponse.data.mapPointId.toString())
+            console.log(photos)
             if (photos) {
                 for (let i = 0; i < photos.length; i++) {
                     dataToSavePhotos.append("photos", photos[i]);
                 }
                 onSuccess();
-                await photoService.createAll(dataToSavePhotos, ()=>{
+                await photoService.createAll(dataToSavePhotos, () => {
                     console.log("Added all photos");
                 }, onFailure);
             } else onSuccess();

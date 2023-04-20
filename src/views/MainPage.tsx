@@ -1,5 +1,6 @@
 import Mapbox from "../components/Map/Mapbox";
 import * as React from 'react';
+import {useEffect} from 'react';
 import {styled, Theme, useTheme} from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -16,6 +17,7 @@ import MapPoint from "../model/MapPoint";
 import {Typography} from "@material-ui/core";
 import Resource from "../model/Resource";
 import Container from '@mui/material/Container';
+import ResourceView from "../components/resource/ResourceView";
 
 const drawerWidth = 340;
 
@@ -59,6 +61,9 @@ export default function MainPage() {
         setOpenedPoint(null)
         setOpen(false);
     };
+    useEffect(() => {
+        console.log(Array.isArray(openedPoint?.resources))
+    }, [openedPoint])
 
     return (
         <React.Fragment>
@@ -99,19 +104,25 @@ export default function MainPage() {
                             Додати пункт на мапу
                         </Button>
                     </Box> : null}
-                {openedPoint ?
-                    <Container component="main" maxWidth="xs">
+                {openedPoint && Array.isArray(openedPoint.resources as Resource[]) ?
+                    <Container component="main" maxWidth="xs" key={openedPoint.id}>
                         <Typography variant="h4">{openedPoint.name}</Typography>
                         <Typography variant="h5">{openedPoint.description}</Typography>
-                        <Typography variant="subtitle1">{`ID: ${openedPoint.id}`}</Typography>
                         <Typography variant="subtitle1">{`Години роботи: ${openedPoint.hoursOfWork}`}</Typography>
                         <Typography variant="subtitle1">{`Телефон: ${openedPoint.phone}`}</Typography>
-                        <Typography variant="subtitle1">Ресурси:</Typography>
-                        <ul>
-                            {Array.isArray(openedPoint.resources) && openedPoint.resources?.map((resource: Resource) => (
-                                <li key={resource.id}>{resource.name}</li>
-                            ))}
-                        </ul>
+                        <Divider/>
+                        <Container style={{margin: '10px 0'}}>
+                            <Typography variant="h5">Наявні ресурси</Typography>
+                            {openedPoint.resources.map((resource) => <ResourceView resource={resource}/>)}
+                        </Container>
+                        {openedPoint.photos.map((photo) => (
+                            <img
+                                key={photo.id}
+                                src={"data:image/png;base64," + photo.fileContent}
+                                alt={photo.fileName}
+                                style={{width: '300px', height: 'auto'}}
+                            />
+                        ))}
                     </Container> : null}
             </Drawer>
             <Main open={open} theme={theme}>

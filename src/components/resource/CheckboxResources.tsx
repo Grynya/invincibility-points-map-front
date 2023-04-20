@@ -1,17 +1,18 @@
 import Resource from "../../model/Resource";
 import {Checkbox, FormControlLabel, FormGroup, InputLabel, List, ListItem} from "@mui/material";
-import Tooltip from "@mui/material/Tooltip";
-import HelpIcon from "@mui/icons-material/Help";
 import * as React from "react";
-import {useState} from 'react';
+import {useState} from "react";
 import {Typography} from "@material-ui/core";
+import ResourceView from "./ResourceView";
 
 export default function CheckboxResources({
                                               resources,
                                               selectedResources,
                                               setSelectedResources
-                                          }: { resources: Resource[] | null, selectedResources: Resource[],
-    setSelectedResources: (resources: Resource[]) => void }) {
+                                          }: {
+    resources: Resource[] | null, selectedResources: Resource[],
+    setSelectedResources: (resources: Resource[]) => void
+}) {
     const [warning, setWarning] = useState<string | null>(null);
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, resource: Resource) => {
@@ -41,14 +42,7 @@ export default function CheckboxResources({
                                     control={<Checkbox
                                         checked={selectedResources.some((r) => r.id === resource.id)}
                                         onChange={(event) => handleCheckboxChange(event, resource)}/>}
-                                    label={
-                                        <>
-                                            {resource.name}
-                                            <Tooltip title={resource.description}>
-                                                <HelpIcon sx={{fontSize: 'small', ml: 1}}/>
-                                            </Tooltip>
-                                        </>
-                                    }
+                                    label={<ResourceView resource={resource}/>}
                                 />
                             </ListItem>
                         )

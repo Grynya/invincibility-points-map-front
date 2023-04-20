@@ -7,26 +7,26 @@ import Box from '@mui/material/Box';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Header from "../../components/Header/Header";
-import Copyright from "../../components/Copyright";
+import Header from "../components/Header/Header";
+import Copyright from "../components/Copyright";
 import {useSelector} from "react-redux";
-import {StoreState} from "../../store/StoreState";
+import {StoreState} from "../store/StoreState";
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {FormGroup, InputLabel} from "@mui/material";
-import Loading from "../../components/Loading";
+import Loading from "../components/Loading";
 import Button from "@mui/material/Button";
 import {makeStyles} from "@material-ui/core/styles";
-import CheckboxResources from "./CheckboxResources"
+import CheckboxResources from "../components/resource/CheckboxResources"
 import 'mapbox-gl/dist/mapbox-gl.css';
-import MapboxSmall from "../../components/Map/MapboxSmall";
+import MapboxSmall from "../components/Map/MapboxSmall";
 import {TimePicker} from '@mui/x-date-pickers';
 import {LngLatLike} from "mapbox-gl";
-import Resource from "../../model/Resource";
-import CreatePointRequest from "../../payloads/request/CreatePointRequest";
+import Resource from "../model/Resource";
+import CreatePointRequest from "../payloads/request/CreatePointRequest";
 import dayjs, {Dayjs} from "dayjs";
-import ErrorAlert from "../../components/alerts/ErrorAlert";
-import pointService from "../../service/PointService";
+import ErrorAlert from "../components/alerts/ErrorAlert";
+import pointService from "../service/PointService";
 
 const useStyles = makeStyles(() => ({
     root: {

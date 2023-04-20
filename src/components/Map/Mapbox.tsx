@@ -98,11 +98,14 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
                         hoursOfWork: clickedPoint.hoursOfWork,
                         phone: clickedPoint.phone,
                         coordinates: JSON.parse(clickedPoint.coordinates),
-                        photos: clickedPoint.photos,
-                        resources: clickedPoint.resources
+                        photos:JSON.parse(clickedPoint.photos),
+                        resources: JSON.parse(clickedPoint.resources),
+                        userId:clickedPoint.usetId
                     });
                     setOpen(true);
                 }
+
+
             });
         }
 

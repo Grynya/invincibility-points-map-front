@@ -1,5 +1,5 @@
 export interface CreatePointResponse {
-    body: {
-        mapPointId: string
-    };
+    data:{
+        mapPointId: number;
+    }
 }

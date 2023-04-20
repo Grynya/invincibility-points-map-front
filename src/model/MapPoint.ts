@@ -1,5 +1,6 @@
 import Resource from "./Resource";
 import Coordinates from "./Coordinates";
+import PointPhoto from "./PointPhoto";
 
 export default interface MapPoint {
     id: number;
@@ -8,6 +9,7 @@ export default interface MapPoint {
     hoursOfWork: string;
     phone: string;
     coordinates: Coordinates;
-    photos: string;
+    photos: PointPhoto[];
     resources: Resource[];
+    userId: number;
 }
