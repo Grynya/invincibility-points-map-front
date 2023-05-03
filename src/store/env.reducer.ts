@@ -1,5 +1,4 @@
 import {
-    SET_GOOGLE_CLIENT_ID,
     SET_LOCATION,
     SET_MAPBOX_ACCESS_TOKEN,
     SET_RESOURCES,
@@ -8,7 +7,6 @@ import {
 import {StoreState} from "./StoreState";
 
 const initialState: StoreState = {
-    googleClientId: null,
     mapboxAccessToken: null,
     resources: null,
     location: [31.182233, 48.382778]
@@ -16,11 +14,6 @@ const initialState: StoreState = {
 
 const envReducer = (state = initialState, action: SettingActions) => {
     switch (action.type) {
-        case SET_GOOGLE_CLIENT_ID:
-            return {
-                ...state,
-                googleClientId: action.payload,
-            };
         case SET_MAPBOX_ACCESS_TOKEN:
             return {
                 ...state,

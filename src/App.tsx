@@ -7,7 +7,6 @@ import RegistrationPage from "./views/RegistrationPage";
 import {useDispatch} from "react-redux";
 import {ProfileProvider} from './components/ProfileProvider';
 import {changeMapboxAccessToken} from "./store/actionCreators/changeMapboxAccessToken";
-import {changeGoogleClientId} from "./store/actionCreators/changeGoogleClientId";
 import {KeyService} from "./service/KeyService";
 import Keys from "./model/Keys";
 import CreatingPointPage from "./views/CreatingPointPage";
@@ -30,7 +29,6 @@ export default function App() {
             const data: Keys = await new KeyService().getKeys();
             const resources = await new ResourceService().getResources();
             dispatch(changeMapboxAccessToken(data.mapboxAccessToken));
-            dispatch(changeGoogleClientId(data.googleClientId));
             dispatch(changeResources(resources));
         };
         fetchData();

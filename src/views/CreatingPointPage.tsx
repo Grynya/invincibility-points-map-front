@@ -39,7 +39,6 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function CreatingPointPage() {
-    const clientId = useSelector((state: StoreState) => state.googleClientId);
     const resources = useSelector((state: StoreState) => state.resources);
     const location:LngLatLike = useSelector((state: StoreState) => state.location);
     const [coordinates, setCoordinates] = useState<LngLatLike>();
@@ -107,7 +106,7 @@ export default function CreatingPointPage() {
     useEffect(() => setCoordinates(location), [location]);
 
     return (
-        clientId === null || resources === null ? <Loading/> :
+        resources === null ? <Loading/> :
             <>
                 <CssBaseline/>
                 <Header open={false}/>
