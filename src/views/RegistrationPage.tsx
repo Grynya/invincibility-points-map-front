@@ -9,16 +9,27 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Copyright from "../components/Copyright";
 import Header from "../components/Header/Header";
+import {useNavigate} from "react-router-dom";
+import {useState} from "react";
+import AuthService from "../service/AuthService";
+import ErrorAlert from "../components/alerts/ErrorAlert";
 
 export default function RegistrationPage() {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email') as string,
-            password: data.get('password') as string,
-        });
-    };
+    const navigate = useNavigate();
+    const [error, setError] = useState({message: "", visible: false});
+        const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            const formData = new FormData(event.currentTarget);
+            const username = formData.get('email')?.toString();
+            const password = formData.get('password')?.toString();
+            if (username !== undefined && password !== undefined) {
+                await AuthService.login(username, password, (error) => {
+                    setError({message: error.response.data.message, visible: true});
+                }, ()=>{
+                    navigate("/");
+                })
+            } else setError({message: "No username or password", visible: true});
+        }
 
     return (
         <React.Fragment>
@@ -70,6 +81,7 @@ export default function RegistrationPage() {
                         >
                             Зареєструватись
                         </Button>
+                        <ErrorAlert error={error} setError={setError}/>
                     </Box>
                 </Box>
                 <Copyright sx={{mt: 8, mb: 4}}/>

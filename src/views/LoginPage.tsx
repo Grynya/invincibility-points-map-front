@@ -26,10 +26,10 @@ export default function LoginPage() {
         const password = formData.get('password')?.toString();
         if (username !== undefined && password !== undefined) {
             await AuthService.login(username, password, (error) => {
-                if (error instanceof Error)
-                    setError({message: error.message, visible: true});
+                setError({message: error.response.data.message, visible: true});
+            }, ()=>{
+                navigate("/");
             })
-            navigate("/");
         } else setError({message: "No username or password", visible: true});
     }
 

@@ -11,6 +11,6 @@ export interface JwtResponse {
     email: string;
     code: string;
     userStatus: EUserStatus;
-    roles: string[];
+    isAdmin: boolean;
 
 }

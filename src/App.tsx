@@ -13,6 +13,8 @@ import CreatingPointPage from "./views/CreatingPointPage";
 import {changeResources} from "./store/actionCreators/changeResources";
 import {ResourceService} from "./service/ResourceService";
 import {changeLocation} from "./store/actionCreators/changeLocation";
+import ErrorVerificationPage from "./views/verification/ErrorVerificationPage";
+import SuccessVerificationPage from "./views/verification/SuccessVerificationPage";
 
 export default function App() {
     const dispatch = useDispatch();
@@ -41,6 +43,8 @@ export default function App() {
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<MainPage/>}/>
+                    <Route path="/errorVerification" element={<ErrorVerificationPage/>}/>
+                    <Route path="/successVerification" element={<SuccessVerificationPage/>}/>
                     <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/registration" element={<RegistrationPage/>}/>
                     <Route path="/addpoint" element={<CreatingPointPage/>}/>

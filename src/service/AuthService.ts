@@ -1,9 +1,10 @@
-import axios, {AxiosResponse} from 'axios';
+import axios, {AxiosResponse, HttpStatusCode} from 'axios';
 import {AppSettings} from "../AppSettings";
 import store from "../store/store"
 import {Store} from 'redux';
 import {JwtResponse} from "../payloads/response/JwtResponse";
 import {JwtRefreshResponse} from "../payloads/response/JwtRefreshResponse";
+import SignUpRequest from "../payloads/request/SignUpRequest";
 
 
 class AuthService {
@@ -25,26 +26,39 @@ class AuthService {
         }
     }
 
-    async login(username: string, password: string, onFailure: (error: any)=>void): Promise<boolean | undefined> {
+    async login(username: string, password: string, onFailure: (error: any)=>void,
+                onSuccess: ()=>void): Promise<void> {
         try {
-            const response: AxiosResponse<JwtResponse> = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/signin`, {
+            const response: AxiosResponse<JwtResponse> = await axios
+                .post(`${AppSettings.API_ENDPOINT}/api/auth/signin`, {
                 username,
                 password,
             });
 
-            const {accessToken, refreshToken, expiresIn, name, surname, email, code, userStatus, roles} = response.data;
-            localStorage.setItem("user", JSON.stringify({name, surname, email, code, userStatus, roles}));
+            const {accessToken, refreshToken, expiresIn, name, surname, email, userStatus, isAdmin} = response.data;
+            localStorage.setItem("user", JSON.stringify({name, surname, email, userStatus, isAdmin}));
 
-            localStorage.setItem("access_token", accessToken)
-            localStorage.setItem("refresh_token", refreshToken)
+            localStorage.setItem("access_token", accessToken);
+            localStorage.setItem("refresh_token", refreshToken);
 
             this.scheduleTokenRefresh(expiresIn);
-
-            return true;
+            onSuccess();
         } catch (error) {
             onFailure(error)
         }
     }
+
+    async registrar(signUpRequest: SignUpRequest, onFailure: (error: any)=>void,
+                onSuccess: ()=>void): Promise<void> {
+        try {
+            const response: AxiosResponse<JwtResponse> = await axios
+                .post(`${AppSettings.API_ENDPOINT}/api/auth/signup`, signUpRequest);
+            if (response.status===HttpStatusCode.Ok) onSuccess();
+        } catch (error) {
+            onFailure(error)
+        }
+    }
+
 
     async doRefreshToken(): Promise<boolean> {
         try {

@@ -29,7 +29,7 @@ const AppBar = styled(MuiAppBar, {
 export default function Header({children, open}: {children?:ReactElement, open:boolean}) {
     const theme = useTheme();
     return (
-        <AppBar position="static"
+        <AppBar position="relative"
                 open={open}
                 className="yellow-bottom-border black-color" theme={theme}>
             <Toolbar>
