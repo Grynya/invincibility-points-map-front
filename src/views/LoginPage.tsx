@@ -19,18 +19,20 @@ import ErrorAlert from "../components/alerts/ErrorAlert";
 export default function LoginPage() {
     const navigate = useNavigate();
     const [error, setError] = useState({message: "", visible: false});
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const username = formData.get('email')?.toString();
-        const password = formData.get('password')?.toString();
-        if (username !== undefined && password !== undefined) {
+        if (username && password) {
             await AuthService.login(username, password, (error) => {
                 setError({message: error.response.data.message, visible: true});
             }, ()=>{
                 navigate("/");
             })
-        } else setError({message: "No username or password", visible: true});
+        } else {
+            setError({message: "No username or password", visible: true});
+        }
     }
 
     return (
@@ -64,6 +66,8 @@ export default function LoginPage() {
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                         />
                         <TextField
                             margin="normal"
@@ -74,12 +78,15 @@ export default function LoginPage() {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                         <Button
                             type="submit"
                             fullWidth
                             variant="contained"
                             sx={{mt: 3}}
+                            disabled={!username || !password}
                         >
                             Увійти
                         </Button>
@@ -91,7 +98,7 @@ export default function LoginPage() {
                                 </Link>
                             </Grid>
                             <Grid item>
-                                <Link href="#" variant="body2">
+                                <Link href="/registration" variant="body2">
                                     {"Зареєструватись"}
                                 </Link>
                             </Grid>

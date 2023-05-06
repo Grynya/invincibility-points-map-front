@@ -10,36 +10,28 @@ import Button from "@mui/material/Button";
 
 export default function SuccessVerificationPage() {
     const navigate = useNavigate();
-    const [hiddenError, setHiddenError] = useState(false);
+    const [showedError, setShowedError] = useState(false);
 
     useEffect(() => {
         const searchParams = new URLSearchParams(window.location.search);
 
-        const name = searchParams.get('name');
-        const surname = searchParams.get('surname');
-        const email = searchParams.get('email');
-        const userStatus = searchParams.get('userStatus');
-        const isAdmin = searchParams.get('isAdmin');
         const accessToken = searchParams.get('accessToken');
         const refreshToken = searchParams.get('refreshToken');
         const expiresIn = searchParams.get('expiresIn');
 
         if (accessToken && refreshToken && expiresIn) {
-            localStorage.setItem("user", JSON.stringify({
-            name: name,
-            surname: surname,
-            email: email,
-            userStatus: userStatus,
-            isAdmin: isAdmin
-        }));
-        console.log(refreshToken)
 
             localStorage.setItem("access_token", accessToken);
             localStorage.setItem("refresh_token", refreshToken);
 
             authService.scheduleTokenRefresh(parseInt(expiresIn));
-            navigate("/");
-        } else setHiddenError(true)
+
+            authService.setUserByAccessToken(accessToken, () => {
+                setShowedError(true)
+            }, () => {
+                navigate("/");
+            })
+        } else setShowedError(true);
     }, []);
 
 
@@ -51,17 +43,21 @@ export default function SuccessVerificationPage() {
                 <Alert severity="success" sx={{mt: 3, mb: 3}}>
                     <AlertTitle>Акаунт активовано</AlertTitle>
                 </Alert>
-                <Alert severity="error" sx={{mt: 3, mb: 3}} hidden={hiddenError}>
-                    <AlertTitle>Помилка авторизації</AlertTitle>
-                </Alert>
-                <Button
-                    hidden={hiddenError}
-                    fullWidth
-                    variant="contained"
-                    href="/login"
-                >
-                    Увійти
-                </Button>
+                {showedError ?
+                    <div>
+                        <Alert severity="error" sx={{mt: 3, mb: 3}} hidden={showedError}>
+                            <AlertTitle>Помилка авторизації</AlertTitle>
+                        </Alert>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            href="/login"
+                        >
+                            Увійти
+                        </Button>
+                    </div>
+                    : null}
+
             </Container>
         </>
     )

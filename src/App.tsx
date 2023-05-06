@@ -32,6 +32,9 @@ export default function App() {
             const resources = await new ResourceService().getResources();
             dispatch(changeMapboxAccessToken(data.mapboxAccessToken));
             dispatch(changeResources(resources));
+            if (!localStorage.getItem("tokenRefreshTimeoutDuration")
+                && !localStorage.getItem("tokenRefreshTimeoutStartTime"))
+                localStorage.clear();
         };
         fetchData();
         navigator.geolocation.getCurrentPosition(successLocation, errorLocation, {

@@ -11,9 +11,11 @@ class PointService {
         return (await axios.post(`${AppSettings.API_ENDPOINT}/public/point/getAll`, pointRequest)).data;
     }
 
-    async createPoint(createPointRequest: CreatePointRequest, photos: FileList | null, onSuccess: () => void, onFailure: (error: any) => void): Promise<void> {
+    async createPoint(createPointRequest: CreatePointRequest, photos: FileList | null, onSuccess: () => void,
+                      onFailure: (error: any) => void): Promise<void> {
         try {
-            let createPointResponse: CreatePointResponse = await axios.post(`${AppSettings.API_ENDPOINT}/point`, createPointRequest);
+            let createPointResponse: CreatePointResponse = await axios.post(`${AppSettings.API_ENDPOINT}/point`,
+                createPointRequest);
             console.log(createPointResponse)
             const dataToSavePhotos = new FormData();
             dataToSavePhotos.append("mapPointId", createPointResponse.data.mapPointId.toString())

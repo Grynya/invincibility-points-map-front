@@ -47,7 +47,19 @@ class AuthService {
             onFailure(error)
         }
     }
+    async setUserByAccessToken(accessToken: string, onFailure: (error: any)=>void,
+                onSuccess: ()=>void): Promise<void> {
+        try {
+            const response: AxiosResponse<JwtResponse> = await axios
+                .get(`${AppSettings.API_ENDPOINT}/user/info-by-access-token?accessToken=${accessToken}`);
 
+            const {name, surname, email, userStatus, isAdmin} = response.data;
+            localStorage.setItem("user", JSON.stringify({name, surname, email, userStatus, isAdmin}));
+            onSuccess();
+        } catch (error) {
+            onFailure(error)
+        }
+    }
     async registrar(signUpRequest: SignUpRequest, onFailure: (error: any)=>void,
                 onSuccess: ()=>void): Promise<void> {
         try {
@@ -77,6 +89,7 @@ class AuthService {
             return true;
         } catch (error) {
             console.error('Token refresh failed:', error);
+            localStorage.removeItem("user")
             return false;
         }
     }
