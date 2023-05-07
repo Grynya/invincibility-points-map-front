@@ -5,7 +5,6 @@ import MainPage from "./views/MainPage";
 import LoginPage from "./views/LoginPage";
 import RegistrationPage from "./views/RegistrationPage";
 import {useDispatch} from "react-redux";
-import {ProfileProvider} from './components/ProfileProvider';
 import {changeMapboxAccessToken} from "./store/actionCreators/changeMapboxAccessToken";
 import {KeyService} from "./service/KeyService";
 import Keys from "./model/Keys";
@@ -42,7 +41,6 @@ export default function App() {
         });
     });
     return (
-        <ProfileProvider>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={<MainPage/>}/>
@@ -53,6 +51,5 @@ export default function App() {
                     <Route path="/addpoint" element={<CreatingPointPage/>}/>
                 </Routes>
             </BrowserRouter>
-        </ProfileProvider>
     )
 }
