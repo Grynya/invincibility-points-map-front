@@ -35,8 +35,8 @@ class AuthService {
                 password,
             });
 
-            const {accessToken, refreshToken, expiresIn, name, surname, email, userStatus, isAdmin} = response.data;
-            localStorage.setItem("user", JSON.stringify({name, surname, email, userStatus, isAdmin}));
+            const {accessToken, refreshToken, expiresIn, id, name, surname, email, userStatus, isAdmin} = response.data;
+            localStorage.setItem("user", JSON.stringify({id, name, surname, email, userStatus, isAdmin}));
 
             localStorage.setItem("access_token", accessToken);
             localStorage.setItem("refresh_token", refreshToken);
@@ -53,8 +53,8 @@ class AuthService {
             const response: AxiosResponse<JwtResponse> = await axios
                 .get(`${AppSettings.API_ENDPOINT}/user/info-by-access-token?accessToken=${accessToken}`);
 
-            const {name, surname, email, userStatus, isAdmin} = response.data;
-            localStorage.setItem("user", JSON.stringify({name, surname, email, userStatus, isAdmin}));
+            const {id, name, surname, email, userStatus, isAdmin} = response.data;
+            localStorage.setItem("user", JSON.stringify({id, name, surname, email, userStatus, isAdmin}));
             onSuccess();
         } catch (error) {
             onFailure(error)

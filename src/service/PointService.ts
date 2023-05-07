@@ -11,7 +11,9 @@ class PointService {
         return (await axios.post(`${AppSettings.API_ENDPOINT}/public/point/getAll`, pointRequest)).data;
     }
 
-    async createPoint(createPointRequest: CreatePointRequest, photos: FileList | null, onSuccess: () => void,
+    async createPoint(createPointRequest: CreatePointRequest,
+                      photos: FileList | null,
+                      onSuccess: () => void,
                       onFailure: (error: any) => void): Promise<void> {
         try {
             let createPointResponse: CreatePointResponse = await axios.post(`${AppSettings.API_ENDPOINT}/point`,
@@ -33,7 +35,39 @@ class PointService {
             onFailure(error);
         }
     }
+    async like(pointId: number,
+               userId: number,
+               onSuccess: () => void,
+               onFailure: (error: any) => void): Promise<void>{
+        try {
+            console.log(await axios.get(`${AppSettings.API_ENDPOINT}/point/like?pointId=${pointId}&userId=${userId}`));
+            onSuccess()
+        } catch (error) {
+            onFailure(error);
+        }
+    }
+    async unlike(pointId: number, userId: number,
+               onSuccess: () => void,
+               onFailure: (error: any) => void): Promise<void>{
+        try {
+            console.log(
+                await axios.get(`${AppSettings.API_ENDPOINT}/point/unlike?pointId=${pointId}&userId=${userId}`));
+            onSuccess()
+        } catch (error) {
+            onFailure(error);
+        }
+    }
 
+    async isLiked(pointId: number, userId: number,
+                 onSuccess: (isLiked: boolean) => void,
+                 onFailure: (error: any) => void): Promise<void>{
+        try {
+            let result = await axios.get(`${AppSettings.API_ENDPOINT}/point/isLiked?pointId=${pointId}&userId=${userId}`);
+            onSuccess(result.data);
+        } catch (error) {
+            onFailure(error);
+        }
+    }
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export
