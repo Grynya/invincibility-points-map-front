@@ -27,6 +27,7 @@ import CreatePointRequest from "../payloads/request/CreatePointRequest";
 import dayjs, {Dayjs} from "dayjs";
 import ErrorAlert from "../components/alerts/ErrorAlert";
 import pointService from "../service/PointService";
+import User from "../model/User";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -40,21 +41,29 @@ const useStyles = makeStyles(() => ({
 
 export default function CreatingPointPage() {
     const resources = useSelector((state: StoreState) => state.resources);
-    const location:LngLatLike = useSelector((state: StoreState) => state.location);
+    const location: LngLatLike = useSelector((state: StoreState) => state.location);
     const [coordinates, setCoordinates] = useState<LngLatLike>();
     const [selectedResources, setSelectedResources] = useState<Resource[]>([]);
-    const [photos, setPhotos] = useState<FileList|null>(null);
+    const [photos, setPhotos] = useState<FileList | null>(null);
     const classes = useStyles();
     const [error, setError] = useState({message: "", visible: false});
+    const [user, setUser] = useState<User>()
 
     const [startDate, setStartDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'));
     const [endDate, setEndDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'))
+
+    useEffect(() => {
+        const userItem = localStorage.getItem("user")
+        if (userItem) {
+            setUser(JSON.parse(userItem))
+        }
+    }, [])
 
     const [formData, setFormData] = useState<CreatePointRequest>({
         name: "",
         description: "",
         phone: "",
-        userId: 1, //todo:profile.id
+        userId: user ? user.id : null,
         coordinates: location,
         hoursOfWork: startDate.format("HH:mm") + '-' + endDate.format("HH:mm"),
         resources: selectedResources,
@@ -65,9 +74,9 @@ export default function CreatingPointPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         console.log(formData)
-        await pointService.createPoint(formData, photos,()=>{
+        await pointService.createPoint(formData, photos, () => {
             console.log("Added mapPoint")
-        },(error) => {
+        }, (error) => {
             if (error instanceof Error)
                 setError({message: error.message, visible: true});
         });
@@ -85,14 +94,14 @@ export default function CreatingPointPage() {
             resources: selectedResources,
         });
     }, [selectedResources]);
-    useEffect(()=>{
+    useEffect(() => {
         if (coordinates) {
             setFormData({
                 ...formData,
                 coordinates: coordinates,
             });
         }
-    },[coordinates])
+    }, [coordinates])
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -198,19 +207,6 @@ export default function CreatingPointPage() {
                             </FormGroup>
                             <FormGroup sx={{mt: 1, mb: 1}}>
                                 <InputLabel>Фото</InputLabel>
-                                {/*<TextField*/}
-                                {/*    sx={{p: 0, m: 0}}*/}
-                                {/*    margin="normal"*/}
-                                {/*    fullWidth*/}
-                                {/*    type="file"*/}
-                                {/*    name="photo"*/}
-                                {/*    id="photo"*/}
-                                {/*    onChange={handleFileInputChange}*/}
-                                {/*    inputProps={{*/}
-                                {/*        accept: 'image/jpeg, image/png, image/gif',*/}
-                                {/*        multiple: true*/}
-                                {/*    }}*/}
-                                {/*/>*/}
                                 <input
                                     type="file"
                                     name="photo"

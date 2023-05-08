@@ -8,5 +8,5 @@ export default interface CreatePointRequest {
     hoursOfWork: string;
     coordinates: LngLatLike;
     resources: Resource[];
-    userId: number;
+    userId: number | null;
 }

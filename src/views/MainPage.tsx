@@ -14,6 +14,7 @@ import MapPoint from "../model/MapPoint";
 import User from "../model/User";
 import SidebarContent from "./sidebarContent/SidebarContent";
 import SidebarAuthorizedContent from "./sidebarContent/SidebarAuthorizedContent";
+import ResourceFilter from "../components/ResourceFilter";
 
 const drawerWidth = 540;
 
@@ -101,6 +102,7 @@ export default function MainPage() {
             <Main open={open} theme={theme}>
                 <Mapbox setOpen={setOpen} setOpenedPoint={setOpenedPoint}/>
             </Main>
+            <ResourceFilter userId={user?.id} open={open} />
         </React.Fragment>
     );
 }

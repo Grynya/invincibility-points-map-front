@@ -14,6 +14,7 @@ import {ResourceService} from "./service/ResourceService";
 import {changeLocation} from "./store/actionCreators/changeLocation";
 import ErrorVerificationPage from "./views/verification/ErrorVerificationPage";
 import SuccessVerificationPage from "./views/verification/SuccessVerificationPage";
+import LikedPointsPage from "./views/LikedPointsPage";
 
 export default function App() {
     const dispatch = useDispatch();
@@ -49,6 +50,7 @@ export default function App() {
                     <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/registration" element={<RegistrationPage/>}/>
                     <Route path="/addpoint" element={<CreatingPointPage/>}/>
+                    <Route path="/likedPoints" element={<LikedPointsPage/>}/>
                 </Routes>
             </BrowserRouter>
     )

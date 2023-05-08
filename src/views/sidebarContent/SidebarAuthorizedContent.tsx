@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect, useState} from 'react';
 import {Divider} from "@mui/material";
 import Box from "@mui/material/Box";
 import MapPoint from "../../model/MapPoint";
@@ -11,18 +12,12 @@ import IconButton from "@mui/material/IconButton";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import {useNavigate} from "react-router-dom";
 import User from "../../model/User";
-import {useEffect, useState} from "react";
 import pointService from "../../service/PointService";
 
 
 export default function SidebarAuthorizedContent({openedPoint, user}:
 { openedPoint: MapPoint | null, user: User}) {
     const navigate = useNavigate();
-    // const [likedStyle, setLikedStyle] = useState<{ isLiked: boolean, text: string; color: string }>({
-    //     isLiked: false,
-    //     text: "Вподобати",
-    //     color: "gray"
-    // });
     const [isLiked, setIsLiked] = useState(false);
     const [likedText, setLikedText] = useState("Вподобати");
     const [likedColor, setLikedColor] = useState("gray");
@@ -59,30 +54,6 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
             }
         }
     };
-
-    // const handleLikePoint = () => {
-    //     if (openedPoint) {
-    //         if (likedStyle.isLiked)
-    //             pointService.unlike(openedPoint.id, user.id,
-    //                 () => {
-    //                     console.log("success")
-    //                     setLikedStyle({isLiked: true, text: "Вподобано", color: "red"})
-    //                     console.log(likedStyle);
-    //                 }, () => {
-    //                     console.log("Unable to unlike point")
-    //                 });
-    //         else pointService.like(openedPoint.id, user.id,
-    //             () => {
-    //                 console.log("success")
-    //                 setLikedStyle({isLiked: false, text: "Вподобати", color: "gray"})
-    //                 console.log(likedStyle);
-    //
-    //             },
-    //             () => {
-    //                 console.log("Unable to load like point")
-    //             });
-    //     }
-    // };
     useEffect(() => {
         if (openedPoint) {
             pointService.isLiked(openedPoint.id, user.id, (isLiked) => {
@@ -104,9 +75,14 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
 
     return (
         <React.Fragment>
-            <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', p: 2}}>
-                <Button variant="contained" color="primary" onClick={() => navigate('/addpoint')}>
+            <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection:"column"}}>
+                <Button variant="contained" color="primary" style={{margin:10}} onClick={() => navigate('/addpoint')}>
                     Додати пункт на мапу
+                </Button>
+                <Button variant="outlined" style={{color: "red", border: "1px solid red", margin:10}}
+                        onClick={()=>navigate("/likedPoints")}>
+                    Показати вподобані пункти
+                    <FavoriteIcon color={'inherit'}/>
                 </Button>
             </Box>
             {!openedPoint ?

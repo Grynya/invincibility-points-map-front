@@ -7,7 +7,7 @@ import AuthMenu from "./AuthMenu";
 import {styled, Theme, useTheme} from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
 
-const drawerWidth = 340;
+const drawerWidth = 540;
 
 const AppBar = styled(MuiAppBar, {
     shouldForwardProp: (prop) => prop !== 'open',

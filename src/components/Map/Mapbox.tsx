@@ -19,7 +19,6 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
     const mapboxAccessToken = useSelector((state: StoreState) => state.mapboxAccessToken);
     const location = useSelector((state: StoreState) => state.location);
     useEffect(() => {
-
         if (mapboxAccessToken && mapContainer.current) {
             mapboxgl.accessToken = mapboxAccessToken
 
@@ -43,7 +42,7 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
                 const zoom = map.getZoom();
                 if (zoom >= 8) {
                     loadPoints(map);
-                } else if (map.getLayer('points')){
+                } else if (map.getLayer('points')) {
                     map.removeLayer('points');
                 }
 
@@ -53,7 +52,7 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
                 const zoom = map.getZoom();
                 if (zoom >= 8) {
                     loadPoints(map);
-                } else if (map.getLayer('points')){
+                } else if (map.getLayer('points')) {
                     map.removeLayer('points');
                 }
             });
@@ -98,9 +97,9 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
                         hoursOfWork: clickedPoint.hoursOfWork,
                         phone: clickedPoint.phone,
                         coordinates: JSON.parse(clickedPoint.coordinates),
-                        photos:JSON.parse(clickedPoint.photos),
+                        photos: JSON.parse(clickedPoint.photos),
                         resources: JSON.parse(clickedPoint.resources),
-                        userId:clickedPoint.usetId
+                        userId: clickedPoint.usetId
                     });
                     setOpen(true);
                 }
@@ -127,7 +126,7 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
             },
         }));
         map.on('mouseenter', 'points', function (e) {
-            const features = map.queryRenderedFeatures(e.point, { layers: ['points'] });
+            const features = map.queryRenderedFeatures(e.point, {layers: ['points']});
             if (!features.length) {
                 return;
             }
@@ -165,7 +164,9 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
     }
 
     return (
-        <div ref={mapContainer} style={{height: '100vh'}}/>
+        <React.Fragment>
+            <div ref={mapContainer} style={{height: '70vh'}}/>
+        </React.Fragment>
     );
 };
 

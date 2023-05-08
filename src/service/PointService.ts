@@ -16,6 +16,10 @@ class PointService {
                       onSuccess: () => void,
                       onFailure: (error: any) => void): Promise<void> {
         try {
+            if (!createPointRequest.userId) {
+                console.log("User id is null");
+                return;
+            }
             let createPointResponse: CreatePointResponse = await axios.post(`${AppSettings.API_ENDPOINT}/point`,
                 createPointRequest);
             console.log(createPointResponse)

@@ -7,11 +7,10 @@ import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import getAddress from "./getAdressString";
 
 interface Props {
-    coordinates: LngLatLike | undefined;
-    setCoordinates: React.Dispatch<React.SetStateAction<LngLatLike | undefined>>;
+    coordinates: LngLatLike;
 }
 
-const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
+const MapboxLikedPoints: React.FC<Props> = ({coordinates}) => {
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const [map, setMap] = useState<Map | null>(null);
     const markerRef = useRef<Marker | null>(null);
@@ -50,14 +49,8 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
                         .setLngLat(coordinates)
                         .addTo(mapInstance);
 
-                    setCoordinates(markerRef.current!.getLngLat());
                     getAddress(mapboxAccessToken, markerRef.current!.getLngLat(), setAddressString);
 
-                    markerRef.current.on("dragend", () => {
-                        const lngLat: LngLatLike = markerRef.current!.getLngLat();
-                        setCoordinates({lat: lngLat.lat, lng: lngLat.lng});
-                        getAddress(mapboxAccessToken, lngLat, setAddressString);
-                    });
                 });
 
                 controlRef.current = new MapboxGeocoder({
@@ -69,7 +62,6 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
                 // @ts-ignore
                 controlRef.current.on('result', e => {
                     markerRef.current?.setLngLat(e.result.center);
-                    getAddress(mapboxAccessToken, markerRef.current!.getLngLat(), setAddressString);
                 });
                 if (controlRef.current && !mapInstance.hasControl(controlRef.current as IControl)) {
                     mapInstance.addControl(controlRef.current);
@@ -81,17 +73,16 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
 
             if (!map) initializeMap({setMap, mapContainer});
         }
-    }, [coordinates, getAddress, map, mapboxAccessToken, setCoordinates]);
+    } );
 
     return (
         <div style={{margin: '1px 0'}}>
-            <InputLabel sx={{mt: 1, mb: 1, fontWeight:"bold", color: "#000000"}}>Обрана адреса: {addressString}</InputLabel>
+            <InputLabel sx={{mt: 1, mb: 1, fontWeight:"bold", color: "#000000"}}>Адреса: {addressString}</InputLabel>
             <div
                 ref={(el) => (mapContainer.current = el)}
-                style={{width: "100%", height: "50vh"}}
-            ></div>
+                style={{width: "100%", height: "50vh"}}/>
         </div>
     );
 };
 
-export default MapboxSmall;
+export default MapboxLikedPoints;
