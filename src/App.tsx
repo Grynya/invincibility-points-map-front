@@ -2,8 +2,8 @@ import * as React from "react";
 import {useEffect} from "react";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import MainPage from "./views/MainPage";
-import LoginPage from "./views/LoginPage";
-import RegistrationPage from "./views/RegistrationPage";
+import LoginPage from "./views/auth/LoginPage";
+import RegistrationPage from "./views/auth/RegistrationPage";
 import {useDispatch} from "react-redux";
 import {changeMapboxAccessToken} from "./store/actionCreators/changeMapboxAccessToken";
 import {KeyService} from "./service/KeyService";
@@ -15,6 +15,9 @@ import {changeLocation} from "./store/actionCreators/changeLocation";
 import ErrorVerificationPage from "./views/verification/ErrorVerificationPage";
 import SuccessVerificationPage from "./views/verification/SuccessVerificationPage";
 import LikedPointsPage from "./views/LikedPointsPage";
+import PasswordRecoveryEmailPage from "./views/password_recovery/PasswordRecoveryEmailPage";
+import PasswordRecoveryCodePage from "./views/password_recovery/PasswordRecoveryCodePage";
+import PasswordRecoveryUpdatingPage from "./views/password_recovery/PasswordRecoveryUpdatingPage";
 
 export default function App() {
     const dispatch = useDispatch();
@@ -49,6 +52,9 @@ export default function App() {
                     <Route path="/successVerification" element={<SuccessVerificationPage/>}/>
                     <Route path="/login" element={<LoginPage/>}/>
                     <Route path="/registration" element={<RegistrationPage/>}/>
+                    <Route path="/passwordRecovery" element={<PasswordRecoveryEmailPage/>}/>
+                    <Route path="/passwordRecoveryCode" element={<PasswordRecoveryCodePage/>}/>
+                    <Route path="/passwordRecoveryUpdate" element={<PasswordRecoveryUpdatingPage/>}/>
                     <Route path="/addpoint" element={<CreatingPointPage/>}/>
                     <Route path="/likedPoints" element={<LikedPointsPage/>}/>
                 </Routes>

@@ -1,38 +1,33 @@
 import * as React from 'react';
+import {useState} from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Header from "../components/Header/Header";
-import Copyright from "../components/Copyright";
-import {useState} from "react";
+import Header from "../../components/Header/Header";
+import Copyright from "../../components/Copyright";
 import {useNavigate} from "react-router-dom";
-import AuthService from "../service/AuthService";
-import ErrorAlert from "../components/alerts/ErrorAlert";
+import ErrorAlert from "../../components/alerts/ErrorAlert";
+import UserService from "../../service/UserService";
 
-export default function LoginPage() {
+export default function PasswordRecoveryEmailPage() {
     const navigate = useNavigate();
     const [error, setError] = useState({message: "", visible: false});
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("");
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (username && password) {
-            await AuthService.login(username, password, (error) => {
+        if (email) {
+            await UserService.sendEmailPasswordRecovery(email, () => {
+                navigate("/passwordRecoveryCode?userEmail="+email);
+            }, (error) => {
                 setError({message: error.response.data.message, visible: true});
-            }, ()=>{
-                navigate("/");
             })
-        } else {
-            setError({message: "No username or password", visible: true});
-        }
+        } else setError({message: "No email or password", visible: true});
     }
 
     return (
@@ -54,7 +49,10 @@ export default function LoginPage() {
                         <LockOutlinedIcon/>
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Вхід
+                        Відновлення паролю
+                    </Typography>
+                    <Typography variant={"subtitle1"} style={{color: "gray", textAlign: "center"}} sx={{mt: 1}}>
+                        Лист з кодом підтвердження для відновлення паролю буде відправлений на цю електронну адресу
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
                         <TextField
@@ -62,47 +60,23 @@ export default function LoginPage() {
                             required
                             fullWidth
                             id="email"
-                            label="Email Address"
+                            label="Email"
                             name="email"
                             autoComplete="email"
                             autoFocus
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                        <TextField
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                         <Button
                             type="submit"
                             fullWidth
                             variant="contained"
                             sx={{mt: 3}}
-                            disabled={!username || !password}
+                            disabled={!email}
                         >
-                            Увійти
+                            Відправити
                         </Button>
-                        <Grid container sx={{mt: 3}}>
-                            <ErrorAlert error={error} setError={setError}/>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Забули пароль?
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link href="/registration" variant="body2">
-                                    {"Зареєструватись"}
-                                </Link>
-                            </Grid>
-                        </Grid>
+                        <ErrorAlert error={error} setError={setError}/>
                     </Box>
                 </Box>
                 <Copyright sx={{mt: 8, mb: 4}}/>
