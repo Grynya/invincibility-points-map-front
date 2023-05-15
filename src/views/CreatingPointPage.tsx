@@ -9,8 +9,6 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Header from "../components/Header/Header";
 import Copyright from "../components/Copyright";
-import {useSelector} from "react-redux";
-import {StoreState} from "../store/StoreState";
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
 import {AlertTitle, FormGroup, InputLabel} from "@mui/material";
@@ -42,8 +40,8 @@ const useStyles = makeStyles(() => ({
 }));
 
 export default function CreatingPointPage() {
-    const resources = useSelector((state: StoreState) => state.resources);
-    const location: LngLatLike = useSelector((state: StoreState) => state.location);
+    const resources = store.getState().resources;
+    const location: LngLatLike = store.getState().location;
     const [coordinates, setCoordinates] = useState<LngLatLike>();
     const [selectedResources, setSelectedResources] = useState<Resource[]>([]);
     const [photos, setPhotos] = useState<FileList | null>(null);
@@ -132,115 +130,119 @@ export default function CreatingPointPage() {
                         <Typography component="h1" variant="h5">
                             Створення нового пункту
                         </Typography>
-                        <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
-                            <ErrorAlert error={error} setError={setError}/>
-                            {success.visible ?
-                                <Alert severity={"success"} sx={{mt: 3, mb: 3}}>
-                                    <AlertTitle><strong>{success.message}</strong></AlertTitle>
-                                </Alert> : null}
-                            <TextField
-                                sx={{mt: 1, mb: 1}}
-                                margin="normal"
-                                required
-                                fullWidth
-                                id="name"
-                                label="Назва"
-                                name="name"
-                                autoComplete="name"
-                                onChange={handleInputChange}
-                                autoFocus
-                            />
-                            <TextField
-                                sx={{mt: 1, mb: 1}}
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="description"
-                                multiline
-                                maxRows={6}
-                                label="Опис"
-                                id="description"
-                                autoComplete="description"
-                                onChange={handleInputChange}
-                            />
-                            <TextField
-                                sx={{mt: 1, mb: 1}}
-                                margin="normal"
-                                required
-                                fullWidth
-                                name="phone"
-                                label="Телефон"
-                                id="phone"
-                                autoComplete="phone"
-                                onChange={handleInputChange}
-                            />
-                            <FormGroup sx={{mt: 1, mb: 1}}>
-                                <InputLabel>Години роботи</InputLabel>
-                                <div style={{display: "flex", paddingTop: 6}}>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <TimePicker
-                                            sx={{m: 0, p: 0, width: '50%'}}
-                                            views={['hours', 'minutes']}
-                                            format="HH:mm"
-                                            value={startDate}
-                                            label="Початок"
-                                            onChange={(newValue) => {
-                                                if (newValue) setStartDate(newValue)
-                                            }}
-                                        />
-                                        <TimePicker
-                                            sx={{
-                                                margin: 0,
-                                                p: 0,
-                                                ml: 1,
-                                                width: '50%'
-                                            }}
-                                            views={['hours', 'minutes']}
-                                            format="HH:mm"
-                                            value={endDate}
-                                            label="Завершення"
-                                            onChange={(newValue) => {
-                                                if (newValue) setEndDate(newValue)
-                                            }}
-                                        />
-                                    </LocalizationProvider>
-                                </div>
-                            </FormGroup>
-                            <FormGroup sx={{mt: 1, mb: 1}}>
-                                <InputLabel>Фото</InputLabel>
-                                <input
-                                    type="file"
-                                    name="photo"
-                                    id="photo"
-                                    onChange={handleFileInputChange}
-                                    accept='image/jpeg, image/png, image/gif'
-                                    multiple
+                        {success.visible ?
+                            <Alert severity={"success"} sx={{mt: 3, mb: 3}}>
+                                <AlertTitle><strong>{success.message}</strong></AlertTitle>
+                            </Alert> : null}
+                        <Box>
+                        <Button
+                            fullWidth
+                            variant="outlined"
+                            sx={{mt: 3, mb: 3}}
+                            onClick={() => navigate("/")}
+                        >
+                            На головну
+                        </Button></Box>
+                        {!success.visible ?
+                            <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
+                                <ErrorAlert error={error} setError={setError}/>
+                                <TextField
+                                    sx={{mt: 1, mb: 1}}
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    id="name"
+                                    label="Назва"
+                                    name="name"
+                                    autoComplete="name"
+                                    onChange={handleInputChange}
+                                    autoFocus
                                 />
-                            </FormGroup>
-                            <CheckboxResources resources={resources}
-                                               selectedResources={selectedResources}
-                                               setSelectedResources={setSelectedResources}/>
-                            <MapboxSmall coordinates={coordinates}
-                                         setCoordinates={setCoordinates}/>
-                            <Button
-                                className={classes.root}
-                                type="submit"
-                                disabled={isDisabledSubmitButton()}
-                                fullWidth
-                                variant="contained"
-                                color="primary"
-                                sx={{mt: 3}}
-                            >
-                                Додати пункт
-                            </Button>
-                            <Button
-                                fullWidth
-                                variant="contained"
-                                onClick={navigate("/")}
-                            >
-                                На головну
-                            </Button>
-                        </Box>
+                                <TextField
+                                    sx={{mt: 1, mb: 1}}
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    name="description"
+                                    multiline
+                                    maxRows={6}
+                                    label="Опис"
+                                    id="description"
+                                    autoComplete="description"
+                                    onChange={handleInputChange}
+                                />
+                                <TextField
+                                    sx={{mt: 1, mb: 1}}
+                                    margin="normal"
+                                    required
+                                    fullWidth
+                                    name="phone"
+                                    label="Телефон"
+                                    id="phone"
+                                    autoComplete="phone"
+                                    onChange={handleInputChange}
+                                />
+                                <FormGroup sx={{mt: 1, mb: 1}}>
+                                    <InputLabel>Години роботи</InputLabel>
+                                    <div style={{display: "flex", paddingTop: 6}}>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <TimePicker
+                                                sx={{m: 0, p: 0, width: '50%'}}
+                                                views={['hours', 'minutes']}
+                                                format="HH:mm"
+                                                value={startDate}
+                                                label="Початок"
+                                                onChange={(newValue) => {
+                                                    if (newValue) setStartDate(newValue)
+                                                }}
+                                            />
+                                            <TimePicker
+                                                sx={{
+                                                    margin: 0,
+                                                    p: 0,
+                                                    ml: 1,
+                                                    width: '50%'
+                                                }}
+                                                views={['hours', 'minutes']}
+                                                format="HH:mm"
+                                                value={endDate}
+                                                label="Завершення"
+                                                onChange={(newValue) => {
+                                                    if (newValue) setEndDate(newValue)
+                                                }}
+                                            />
+                                        </LocalizationProvider>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup sx={{mt: 1, mb: 1}}>
+                                    <InputLabel>Фото</InputLabel>
+                                    <input
+                                        type="file"
+                                        name="photo"
+                                        id="photo"
+                                        onChange={handleFileInputChange}
+                                        accept='image/jpeg, image/png, image/gif'
+                                        multiple
+                                    />
+                                </FormGroup>
+                                <CheckboxResources resources={resources}
+                                                   selectedResources={selectedResources}
+                                                   setSelectedResources={setSelectedResources}/>
+                                <MapboxSmall coordinates={coordinates}
+                                             setCoordinates={setCoordinates}/>
+                                <Button
+                                    className={classes.root}
+                                    type="submit"
+                                    disabled={isDisabledSubmitButton()}
+                                    fullWidth
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{mt: 3}}
+                                >
+                                    Додати пункт
+                                </Button>
+                            </Box>
+                            : null}
                     </div>
                     <Copyright sx={{mt: 8, mb: 4}}/>
                 </Container>
