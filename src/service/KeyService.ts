@@ -1,10 +1,10 @@
 import Keys from "../model/Keys";
 import {AppSettings} from "../AppSettings";
-import axios from 'axios';
+import axiosInstance from "./axiosInstance";
 
 export class KeyService {
     async getKeys():Promise<Keys>{
-        let res= await axios.get(`${AppSettings.API_ENDPOINT}/public/keys`);
+        let res= await axiosInstance.get(`${AppSettings.API_ENDPOINT}/public/keys`);
         return res.data
     }
 }

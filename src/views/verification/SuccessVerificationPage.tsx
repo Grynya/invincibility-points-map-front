@@ -7,6 +7,9 @@ import Header from "../../components/Header/Header";
 import {Alert, AlertTitle} from '@mui/material';
 import authService from "../../service/AuthService";
 import Button from "@mui/material/Button";
+import userService from "../../service/UserService";
+import store from "../../store/store";
+import {changeToken} from "../../store/actionCreators/changeToken";
 
 export default function SuccessVerificationPage() {
     const navigate = useNavigate();
@@ -20,13 +23,11 @@ export default function SuccessVerificationPage() {
         const expiresIn = searchParams.get('expiresIn');
 
         if (accessToken && refreshToken && expiresIn) {
-
-            localStorage.setItem("access_token", accessToken);
-            localStorage.setItem("refresh_token", refreshToken);
+            store.dispatch(changeToken({accessToken, refreshToken}))
 
             authService.scheduleTokenRefresh(parseInt(expiresIn));
 
-            authService.setUserByAccessToken(accessToken, () => {
+            userService.setUserByAccessToken(accessToken, () => {
                 setShowedError(true)
             }, () => {
                 navigate("/");

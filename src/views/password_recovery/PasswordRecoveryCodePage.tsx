@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useState} from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -9,12 +10,11 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Header from "../../components/Header/Header";
 import Copyright from "../../components/Copyright";
-import {useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import ErrorAlert from "../../components/alerts/ErrorAlert";
 import Alert from "@mui/material/Alert";
 import {AlertTitle} from "@mui/material";
-import UserService from "../../service/UserService";
+import authService from "../../service/AuthService";
 
 export default function PasswordRecoveryCodePage() {
     const navigate = useNavigate();
@@ -27,7 +27,7 @@ export default function PasswordRecoveryCodePage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (code) {
-            await UserService.checkCodePasswordRecovery(email!, code, () => {
+            await authService.checkCodePasswordRecovery(email!, code, () => {
                 navigate(`/passwordRecoveryUpdate?userEmail=${email}&code=${code}`);
             }, (error) => {
                 setError({message: error.response.data.message, visible: true});

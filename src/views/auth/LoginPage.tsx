@@ -25,7 +25,7 @@ export default function LoginPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (username && password) {
-            await AuthService.login(username, password, (error) => {
+            await AuthService.signin(username, password, (error) => {
                 setError({message: error.response.data.message, visible: true});
             }, ()=>{
                 navigate("/");

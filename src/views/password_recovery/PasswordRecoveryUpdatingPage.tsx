@@ -12,9 +12,9 @@ import Header from "../../components/Header/Header";
 import Copyright from "../../components/Copyright";
 import {useLocation, useNavigate} from "react-router-dom";
 import ErrorAlert from "../../components/alerts/ErrorAlert";
-import UserService from "../../service/UserService";
 import Alert from "@mui/material/Alert";
 import {AlertTitle} from "@mui/material";
+import authService from "../../service/AuthService";
 
 export default function PasswordRecoveryUpdatingPage() {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function PasswordRecoveryUpdatingPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formData.password) {
-            await UserService.updatePasswordRecovery(email!, code!, formData.password, () => {
+            await authService.updatePasswordRecovery(email!, code!, formData.password, () => {
                 setSuccess({message: "Пароль оновлено", visible: true});
             }, (error) => {
                 setError({message: error.response.data.message, visible: true});

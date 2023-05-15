@@ -3,7 +3,7 @@ import mapboxgl, {IControl, Map} from 'mapbox-gl';
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
-import pointService from "../../service/PointService";
+import pointService from "../../service/MapPointService";
 import {Feature, Point} from "geojson";
 import MapPoint from "../../model/MapPoint";
 
@@ -165,7 +165,7 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
 
     return (
         <React.Fragment>
-            <div ref={mapContainer} style={{height: '70vh'}}/>
+            <div ref={mapContainer} style={{height: '90vh'}}/>
         </React.Fragment>
     );
 };

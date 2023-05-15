@@ -1,6 +1,6 @@
 import Mapbox from "../components/Map/Mapbox";
 import * as React from 'react';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {styled, Theme, useTheme} from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -11,10 +11,9 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Header from "../components/Header/Header";
 import {Divider} from "@mui/material";
 import MapPoint from "../model/MapPoint";
-import User from "../model/User";
 import SidebarContent from "./sidebarContent/SidebarContent";
 import SidebarAuthorizedContent from "./sidebarContent/SidebarAuthorizedContent";
-import ResourceFilter from "../components/ResourceFilter";
+import store from "../store/store";
 
 const drawerWidth = 540;
 
@@ -49,7 +48,7 @@ export default function MainPage() {
     const theme = useTheme();
     const [open, setOpen] = useState<boolean>(false);
     const [openedPoint, setOpenedPoint] = useState<MapPoint | null>(null);
-    const [user, setUser] = useState<User | null>(null);
+    const user = store.getState().user;
 
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -58,10 +57,6 @@ export default function MainPage() {
         setOpenedPoint(null)
         setOpen(false);
     };
-    useEffect(() => {
-        let userStr = localStorage.getItem("user");
-        if (userStr) setUser(JSON.parse(userStr));
-    }, [openedPoint])
 
     return (
         <React.Fragment>
@@ -96,13 +91,14 @@ export default function MainPage() {
                     </IconButton>
                 </DrawerHeader>
                 <Divider/>
-                {user? <SidebarAuthorizedContent openedPoint={openedPoint} user={user}/>:
+                {user ?
+                    <SidebarAuthorizedContent openedPoint={openedPoint} user={user}/> :
                     <SidebarContent openedPoint={openedPoint}/>}
             </Drawer>
             <Main open={open} theme={theme}>
                 <Mapbox setOpen={setOpen} setOpenedPoint={setOpenedPoint}/>
             </Main>
-            <ResourceFilter userId={user?.id} open={open} />
+            {/*<ResourceFilter userId={user?.id} open={open} />*/}
         </React.Fragment>
     );
 }

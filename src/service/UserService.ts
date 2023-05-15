@@ -1,53 +1,34 @@
-import axios from "axios";
+import {AxiosResponse} from "axios";
 import {AppSettings} from "../AppSettings";
 import MapPoint from "../model/MapPoint";
+import {JwtResponse} from "../payloads/response/JwtResponse";
+import store from "../store/store";
+import {changeUser} from "../store/actionCreators/changeUser";
+import axiosInstance from "./axiosInstance";
 
 class UserService {
+    async setUserByAccessToken(accessToken: string, onFailure: (error: any) => void,
+                               onSuccess: () => void): Promise<void> {
+        try {
+            const response: AxiosResponse<JwtResponse> =
+                await axiosInstance
+                    .get(`${AppSettings.API_ENDPOINT}/user/info-by-access-token?accessToken=${accessToken}`);
+            const {id, name, surname, email, userStatus, isAdmin} = response.data;
+            store.dispatch(changeUser({id, name, surname, email, userStatus, isAdmin}))
+            onSuccess();
+        } catch (error) {
+            onFailure(error)
+        }
+    }
+
     async getLikedPoints(userId: number,
                          onSuccess: (likedPoints: MapPoint[]) => void,
                          onFailure: (error: any) => void): Promise<void> {
         try {
-            let result = await axios.get(`${AppSettings.API_ENDPOINT}/user/likedPoints?userId=${userId}`);
-            onSuccess(result.data);
-        } catch (error) {
-            onFailure(error);
-        }
-    }
-
-    async sendEmailPasswordRecovery(userEmail: string,
-                                    onSuccess: (likedPoints: MapPoint[]) => void,
-                                    onFailure: (error: any) => void): Promise<void> {
-        try {
-            let result = await axios
-                .get(`${AppSettings.API_ENDPOINT}/user/passwordRecovery/sendEmail?userEmail=${userEmail}`);
-            onSuccess(result.data);
-        } catch (error) {
-            onFailure(error);
-        }
-    }
-
-    async checkCodePasswordRecovery(userEmail: string,
-                                    code: string,
-                                    onSuccess: (isCorrectCode: boolean) => void,
-                                    onFailure: (error: any) => void) {
-        try {
-            let result = await axios
-                .get(`${AppSettings.API_ENDPOINT}/user/passwordRecovery/checkCode?userEmail=${userEmail}&code=${code}`);
-            console.log(result);
-            onSuccess(result.data);
-        } catch (error) {
-            onFailure(error);
-        }
-    }
-
-    async updatePasswordRecovery(userEmail: string,
-                                 code: string,
-                                 password: string,
-                                 onSuccess: (isCorrectCode: boolean) => void,
-                                 onFailure: (error: any) => void) {
-        try {
-            let result = await axios
-                .get(`${AppSettings.API_ENDPOINT}/user/passwordRecovery/update?userEmail=${userEmail}&code=${code}&password=${password}`);
+            let result =
+                await axiosInstance
+                    .get(`${AppSettings.API_ENDPOINT}/user/likedPoints?userId=${userId}`);
+            console.log(result)
             onSuccess(result.data);
         } catch (error) {
             onFailure(error);

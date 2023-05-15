@@ -5,23 +5,17 @@ import React, {useEffect, useState} from "react";
 import {IconButton, Toolbar} from "@material-ui/core";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import useStyles from "./styles";
-import User from "../../model/User";
 import Logout from "./Logout";
+import store from "../../store/store";
 
 export default function AuthMenu() {
     const [anchorEl, setAnchorEl] = useState<any>(null);
-    const [user, setUser] = useState<User>()
+    const user = store.getState().user
     const classes: ClassNameMap = useStyles();
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget);
 
     const handleClose = () => setAnchorEl(null);
 
-    useEffect(() => {
-        const userItem = localStorage.getItem("user")
-        if (userItem) {
-            setUser(JSON.parse(userItem))
-        }
-    }, [])
     return <Toolbar>
         <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu"
                     onClick={handleClick}>

@@ -8,8 +8,9 @@ const Logout: React.FC = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        authService.logout();
-        navigate("/login"); // Replace "/login" with the route you want to navigate to after logout
+        authService.signout(()=>{
+            navigate("/login");
+        });
     };
 
     return (

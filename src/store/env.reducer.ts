@@ -1,7 +1,9 @@
 import {
     SET_LOCATION,
     SET_MAPBOX_ACCESS_TOKEN,
-    SET_RESOURCES,
+    SET_RESOURCES, SET_TOKEN,
+    SET_TOKEN_INFO,
+    SET_USER,
     SettingActions
 } from './actionTypes';
 import {StoreState} from "./StoreState";
@@ -9,7 +11,10 @@ import {StoreState} from "./StoreState";
 const initialState: StoreState = {
     mapboxAccessToken: null,
     resources: null,
-    location: [31.182233, 48.382778]
+    location: [31.182233, 48.382778],
+    user: null,
+    tokenInfo:null,
+    token: null
 };
 
 const envReducer = (state = initialState, action: SettingActions) => {
@@ -29,6 +34,21 @@ const envReducer = (state = initialState, action: SettingActions) => {
                 ...state,
                 location: action.payload,
             };
+        case SET_USER:
+            return {
+                ...state,
+                user: action.payload,
+            };
+        case SET_TOKEN_INFO:
+            return {
+                ...state,
+                tokenInfo: action.payload
+            };
+        case SET_TOKEN:
+            return {
+                ...state,
+                token: action.payload
+            }
         default:
             return state;
     }

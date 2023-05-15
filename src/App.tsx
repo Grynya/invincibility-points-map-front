@@ -4,7 +4,6 @@ import {BrowserRouter, Route, Routes} from "react-router-dom";
 import MainPage from "./views/MainPage";
 import LoginPage from "./views/auth/LoginPage";
 import RegistrationPage from "./views/auth/RegistrationPage";
-import {useDispatch} from "react-redux";
 import {changeMapboxAccessToken} from "./store/actionCreators/changeMapboxAccessToken";
 import {KeyService} from "./service/KeyService";
 import Keys from "./model/Keys";
@@ -18,13 +17,13 @@ import LikedPointsPage from "./views/LikedPointsPage";
 import PasswordRecoveryEmailPage from "./views/password_recovery/PasswordRecoveryEmailPage";
 import PasswordRecoveryCodePage from "./views/password_recovery/PasswordRecoveryCodePage";
 import PasswordRecoveryUpdatingPage from "./views/password_recovery/PasswordRecoveryUpdatingPage";
+import store from "./store/store";
 
 export default function App() {
-    const dispatch = useDispatch();
 
     function successLocation(position:any) {
         const { longitude, latitude } = position.coords;
-        dispatch(changeLocation([longitude, latitude]))
+        store.dispatch(changeLocation([longitude, latitude]))
     }
     function errorLocation() {
         console.log("Unable to get current location.")
@@ -33,11 +32,12 @@ export default function App() {
         const fetchData = async () => {
             const data: Keys = await new KeyService().getKeys();
             const resources = await new ResourceService().getResources();
-            dispatch(changeMapboxAccessToken(data.mapboxAccessToken));
-            dispatch(changeResources(resources));
-            if (!localStorage.getItem("tokenRefreshTimeoutDuration")
-                && !localStorage.getItem("tokenRefreshTimeoutStartTime"))
-                localStorage.clear();
+            store.dispatch(changeMapboxAccessToken(data.mapboxAccessToken));
+            store.dispatch(changeResources(resources));
+            console.log(store.getState())
+            // if (!localStorage.getItem("tokenRefreshTimeoutDuration")
+            //     && !localStorage.getItem("tokenRefreshTimeoutStartTime"))
+            //     localStorage.clear();
         };
         fetchData();
         navigator.geolocation.getCurrentPosition(successLocation, errorLocation, {

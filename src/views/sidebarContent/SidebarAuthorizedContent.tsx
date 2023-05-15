@@ -12,39 +12,81 @@ import IconButton from "@mui/material/IconButton";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import {useNavigate} from "react-router-dom";
 import User from "../../model/User";
-import pointService from "../../service/PointService";
-
+import pointService from "../../service/MapPointService";
+import {ERating} from "../../model/ERating";
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 
 export default function SidebarAuthorizedContent({openedPoint, user}:
-{ openedPoint: MapPoint | null, user: User}) {
+                                                     { openedPoint: MapPoint | null, user: User }) {
     const navigate = useNavigate();
-    const [isLiked, setIsLiked] = useState(false);
-    const [likedText, setLikedText] = useState("Вподобати");
+    // const [isLiked, setIsLiked] = useState(false);
+    // const [isDisliked, setIsDisliked] = useState(false);
+    const [rating, setRating] = useState<ERating>();
     const [likedColor, setLikedColor] = useState("gray");
+    const [dislikedColor, setDislikedColor] = useState("gray");
 
-    const handleLikePoint = () => {
-        console.log(isLiked);
+    const handleDislikePoint = () => {
         if (openedPoint) {
-            if (isLiked) {
-                pointService.unlike(
+            //delete dislike
+            if (rating === ERating.DISLIKED) {
+                pointService.rate(
                     openedPoint.id,
                     user.id,
+                    ERating.NOT_RATED,
                     () => {
-                        setIsLiked(false);
-                        setLikedText("Вподобати");
-                        setLikedColor("gray");
+                        setRating(ERating.NOT_RATED);
+                        setDislikedColor("gray");
                     },
                     () => {
-                        console.log("Unable to unlike point");
+                        console.log("Unable to delete dislike of point");
                     }
                 );
             } else {
-                pointService.like(
+                //do dislike
+                pointService.rate(
                     openedPoint.id,
                     user.id,
+                    ERating.DISLIKED,
                     () => {
-                        setIsLiked(true);
-                        setLikedText("Вподобано");
+                        setRating(ERating.DISLIKED);
+                        setLikedColor("gray");
+                        setDislikedColor("black");
+                    },
+                    () => {
+                        console.log("Unable to dislike point");
+                    }
+                );
+            }
+        }
+    }
+    const handleLikePoint = () => {
+        if (openedPoint) {
+            //delete like
+            if (rating === ERating.LIKED) {
+                pointService.rate(
+                    openedPoint.id,
+                    user.id,
+                    ERating.NOT_RATED,
+                    () => {
+                        setRating(ERating.NOT_RATED);
+                        console.log("do unlike");
+                        setLikedColor("gray");
+                    },
+                    () => {
+                        console.log("Unable to delete like of point");
+                    }
+                );
+            } else {
+                //do like
+                pointService.rate(
+                    openedPoint.id,
+                    user.id,
+                    ERating.LIKED,
+                    () => {
+                        setRating(ERating.LIKED);
+                        console.log("do like")
+                        setDislikedColor("gray");
                         setLikedColor("red");
                     },
                     () => {
@@ -56,16 +98,18 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
     };
     useEffect(() => {
         if (openedPoint) {
-            pointService.isLiked(openedPoint.id, user.id, (isLiked) => {
-                if (isLiked) {
-                    setIsLiked(true);
-                    setLikedText("Вподобано");
+            pointService.getRating(openedPoint.id, user.id, (rating: ERating) => {
+                setRating(rating);
+                if (rating === ERating.LIKED) {
+                    // setIsLiked(true);
+                    // setLikedText("Вподобано");
+                    setDislikedColor("gray");
                     setLikedColor("red");
-                }
-                else {
-                    setIsLiked(false);
-                    setLikedText("Вподобати");
+                } else if (rating === ERating.DISLIKED) {
+                    // setIsLiked(false);
+                    // setLikedText("Вподобати");
                     setLikedColor("gray");
+                    setDislikedColor("black");
                 }
             }, () => {
                 console.log("Unable to load like of point")
@@ -75,12 +119,12 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
 
     return (
         <React.Fragment>
-            <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection:"column"}}>
-                <Button variant="contained" color="primary" style={{margin:10}} onClick={() => navigate('/addpoint')}>
+            <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: "column"}}>
+                <Button variant="contained" color="primary" style={{margin: 10}} onClick={() => navigate('/addpoint')}>
                     Додати пункт на мапу
                 </Button>
-                <Button variant="outlined" style={{color: "red", border: "1px solid red", margin:10}}
-                        onClick={()=>navigate("/likedPoints")}>
+                <Button variant="outlined" style={{color: "red", border: "1px solid red", margin: 10}}
+                        onClick={() => navigate("/likedPoints")}>
                     Показати вподобані пункти
                     <FavoriteIcon color={'inherit'}/>
                 </Button>
@@ -95,20 +139,37 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                 <Container component="main" maxWidth="xl" key={openedPoint.id}>
                     <Container style={{margin: '10px 0'}}>
                         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
-                            <Typography variant="h3">{openedPoint.name}</Typography>
-                            <IconButton
-                                onClick={handleLikePoint}
-                                size="small"
-                                sx={{
-                                    '&:hover': {
-                                        color: 'red',
-                                        backgroundColor: 'transparent'
-                                    },
-                                    color: likedColor
-                                }}
-                            >{likedText}
-                                <FavoriteIcon color={'inherit'}/>
-                            </IconButton>
+                            <Typography variant="h3">{openedPoint.id}. {openedPoint.name}</Typography>
+                            <Box sx={{
+                                display: 'flex', justifyContent: 'space-between',
+                                alignItems: 'center'
+                            }}>
+                                <IconButton
+                                    onClick={handleLikePoint}
+                                    size="small"
+                                    sx={{
+                                        '&:hover': {
+                                            color: 'red',
+                                            backgroundColor: 'transparent'
+                                        },
+                                        color: likedColor
+                                    }}
+                                ><ThumbUpIcon/>
+                                </IconButton>
+                                <IconButton
+                                    onClick={handleDislikePoint}
+                                    size="small"
+                                    sx={{
+                                        '&:hover': {
+                                            color: 'black',
+                                            backgroundColor: 'transparent'
+                                        },
+                                        color: dislikedColor
+                                    }}
+                                ><ThumbDownIcon/>
+                                </IconButton>
+                            </Box>
+
                         </Box>
                         <Typography variant="h6">{openedPoint.description}</Typography>
                         <Typography variant="h6">{`Години роботи: ${openedPoint.hoursOfWork}`}</Typography>

@@ -30,7 +30,7 @@ export default function RegistrationPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (formData.name && formData.surname && formData.email && formData.password && formData.password === formData.confirmedPassword) {
-            await AuthService.registrar(
+            await AuthService.signup(
                 {
                     name: formData.name,
                     surname: formData.surname,

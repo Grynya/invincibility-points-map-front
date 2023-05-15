@@ -12,7 +12,7 @@ import Header from "../../components/Header/Header";
 import Copyright from "../../components/Copyright";
 import {useNavigate} from "react-router-dom";
 import ErrorAlert from "../../components/alerts/ErrorAlert";
-import UserService from "../../service/UserService";
+import authService from "../../service/AuthService";
 
 export default function PasswordRecoveryEmailPage() {
     const navigate = useNavigate();
@@ -22,7 +22,7 @@ export default function PasswordRecoveryEmailPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (email) {
-            await UserService.sendEmailPasswordRecovery(email, () => {
+            await authService.sendEmailPasswordRecovery(email, () => {
                 navigate("/passwordRecoveryCode?userEmail="+email);
             }, (error) => {
                 setError({message: error.response.data.message, visible: true});

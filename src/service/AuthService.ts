@@ -1,10 +1,15 @@
-import axios, {AxiosResponse, HttpStatusCode} from 'axios';
+import {AxiosResponse, HttpStatusCode} from 'axios';
 import {AppSettings} from "../AppSettings";
 import store from "../store/store"
 import {Store} from 'redux';
 import {JwtResponse} from "../payloads/response/JwtResponse";
 import {JwtRefreshResponse} from "../payloads/response/JwtRefreshResponse";
 import SignUpRequest from "../payloads/request/SignUpRequest";
+import MapPoint from "../model/MapPoint";
+import {changeUser} from "../store/actionCreators/changeUser";
+import {changeTokenInfo} from "../store/actionCreators/changeTokenInfo";
+import {changeToken} from "../store/actionCreators/changeToken";
+import axiosInstance from "./axiosInstance";
 
 
 class AuthService {
@@ -13,34 +18,39 @@ class AuthService {
 
     constructor() {
         this.refreshTimeout = null;
-        this.store = store
-
-        const storedTimeoutDuration = localStorage.getItem('tokenRefreshTimeoutDuration');
-        if (storedTimeoutDuration) {
-            const remainingTimeoutDuration = parseInt(storedTimeoutDuration) - (Date.now() - parseInt(localStorage.getItem('tokenRefreshTimeoutStartTime')!));
+        this.store = store;
+        const tokenInfo = store.getState().tokenInfo;
+        if (tokenInfo && tokenInfo.tokenRefreshTimeoutDuration) {
+            const storedTimeoutDuration = tokenInfo.tokenRefreshTimeoutDuration;
+            const remainingTimeoutDuration =
+                storedTimeoutDuration - (Date.now() - tokenInfo.tokenRefreshTimeoutStartTime);
             if (remainingTimeoutDuration > 0) {
                 this.scheduleTokenRefresh(remainingTimeoutDuration);
             }
-            localStorage.removeItem('tokenRefreshTimeoutDuration');
-            localStorage.removeItem('tokenRefreshTimeoutStartTime');
+            store.dispatch(changeTokenInfo({
+                tokenRefreshTimeoutDuration: null,
+                tokenRefreshTimeoutStartTime: null
+            }));
         }
     }
 
-    async login(username: string, password: string, onFailure: (error: any) => void,
-                onSuccess: () => void): Promise<void> {
+
+    async signin(username: string, password: string, onFailure: (error: any) => void,
+                 onSuccess: () => void): Promise<void> {
         try {
-            const response: AxiosResponse<JwtResponse> = await axios
-                .post(`${AppSettings.API_ENDPOINT}/api/auth/signin`, {
+            const response: AxiosResponse<JwtResponse> = await axiosInstance
+                .post(`${AppSettings.API_ENDPOINT}/public/signin`, {
                     username,
                     password,
                 });
 
             const {accessToken, refreshToken, expiresIn, id, name, surname, email, userStatus, isAdmin} = response.data;
-            localStorage.setItem("user", JSON.stringify({id, name, surname, email, userStatus, isAdmin}));
-
-            localStorage.setItem("access_token", accessToken);
-            localStorage.setItem("refresh_token", refreshToken);
-
+            store.dispatch(changeUser({id, name, surname, email, userStatus, isAdmin}));
+            store.dispatch(changeToken({
+                accessToken: accessToken,
+                refreshToken: refreshToken
+            }));
+            console.log(store.getState())
             this.scheduleTokenRefresh(expiresIn);
             onSuccess();
         } catch (error) {
@@ -48,25 +58,11 @@ class AuthService {
         }
     }
 
-    async setUserByAccessToken(accessToken: string, onFailure: (error: any) => void,
-                               onSuccess: () => void): Promise<void> {
+    async signup(signUpRequest: SignUpRequest, onFailure: (error: any) => void,
+                 onSuccess: () => void): Promise<void> {
         try {
-            const response: AxiosResponse<JwtResponse> = await axios
-                .get(`${AppSettings.API_ENDPOINT}/user/info-by-access-token?accessToken=${accessToken}`);
-
-            const {id, name, surname, email, userStatus, isAdmin} = response.data;
-            localStorage.setItem("user", JSON.stringify({id, name, surname, email, userStatus, isAdmin}));
-            onSuccess();
-        } catch (error) {
-            onFailure(error)
-        }
-    }
-
-    async registrar(signUpRequest: SignUpRequest, onFailure: (error: any) => void,
-                    onSuccess: () => void): Promise<void> {
-        try {
-            const response: AxiosResponse<JwtResponse> = await axios
-                .post(`${AppSettings.API_ENDPOINT}/api/auth/signup`, signUpRequest);
+            const response: AxiosResponse<JwtResponse> = await axiosInstance
+                .post(`${AppSettings.API_ENDPOINT}/public/signup`, signUpRequest);
             if (response.status === HttpStatusCode.Ok) onSuccess();
         } catch (error) {
             onFailure(error)
@@ -74,25 +70,26 @@ class AuthService {
     }
 
 
-    async doRefreshToken(): Promise<boolean> {
+    async doRefreshToken(): Promise<void> {
         try {
-            console.log(localStorage.getItem("refresh_token"))
-            let response: AxiosResponse<JwtRefreshResponse>
-                = await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/refreshtoken`, {
-                refreshToken: localStorage.getItem("refresh_token"),
-            });
+            const token = store.getState().token;
+            if (token) {
+                let response: AxiosResponse<JwtRefreshResponse> =
+                    await axiosInstance.post(`${AppSettings.API_ENDPOINT}/public/refreshtoken`,
+                        {
+                            refreshToken: token.refreshToken,
+                        });
+                const {accessToken, refreshToken, expiresIn} = response.data;
 
-            const {accessToken, refreshToken, expiresIn} = response.data;
-
-            this.scheduleTokenRefresh(expiresIn);
-            localStorage.setItem("access_token", accessToken)
-            localStorage.setItem("refresh_token", refreshToken)
-
-            return true;
+                this.scheduleTokenRefresh(expiresIn);
+                store.dispatch(changeToken({
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                }));
+            }
         } catch (error) {
             console.error('Token refresh failed:', error);
-            localStorage.removeItem("user")
-            return false;
+            store.dispatch(changeUser(null));
         }
     }
 
@@ -106,30 +103,69 @@ class AuthService {
         this.refreshTimeout = setTimeout(() => {
             this.doRefreshToken();
             console.log("refreshed");
-            localStorage.setItem('tokenRefreshTimeoutDuration', timeoutDuration.toString());
-            localStorage.setItem('tokenRefreshTimeoutStartTime', Date.now().toString());
+            console.log(store.getState().token)
+            store.dispatch(changeTokenInfo({
+                tokenRefreshTimeoutDuration: timeoutDuration,
+                tokenRefreshTimeoutStartTime: Date.now()
+            }));
         }, timeoutDuration);
     }
 
-    logout = async (): Promise<void> => {
+    signout = async (afterLogout: () => void): Promise<void> => {
         try {
-            const accessToken = localStorage.getItem("access_token");
-            const headers = {
-                Authorization: `Bearer ${accessToken}`
-            };
-            await axios.post(`${AppSettings.API_ENDPOINT}/api/auth/signout`, {}, { headers });
+            await axiosInstance.get(`${AppSettings.API_ENDPOINT}/signout`);
             if (this.refreshTimeout) {
                 clearTimeout(this.refreshTimeout);
             }
-            localStorage.removeItem("user");
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            localStorage.removeItem('tokenRefreshTimeoutDuration');
-            localStorage.removeItem('tokenRefreshTimeoutStartTime');
+            store.dispatch(changeUser(null));
+            store.dispatch(changeToken(null));
+            store.dispatch(changeTokenInfo(null));
             // eslint-disable-next-line no-restricted-globals
             location.reload();
+            afterLogout();
         } catch (error) {
             console.log("Unable to logout");
+            afterLogout();
+        }
+    }
+
+    async sendEmailPasswordRecovery(userEmail: string,
+                                    onSuccess: (likedPoints: MapPoint[]) => void,
+                                    onFailure: (error: any) => void): Promise<void> {
+        try {
+            let result = await axiosInstance
+                .get(`${AppSettings.API_ENDPOINT}/public/passwordRecovery/sendEmail?userEmail=${userEmail}`);
+            onSuccess(result.data);
+        } catch (error) {
+            onFailure(error);
+        }
+    }
+
+    async checkCodePasswordRecovery(userEmail: string,
+                                    code: string,
+                                    onSuccess: (isCorrectCode: boolean) => void,
+                                    onFailure: (error: any) => void) {
+        try {
+            let result = await axiosInstance
+                .get(`${AppSettings.API_ENDPOINT}/public/passwordRecovery/checkCode?userEmail=${userEmail}&code=${code}`);
+            console.log(result);
+            onSuccess(result.data);
+        } catch (error) {
+            onFailure(error);
+        }
+    }
+
+    async updatePasswordRecovery(userEmail: string,
+                                 code: string,
+                                 password: string,
+                                 onSuccess: (isCorrectCode: boolean) => void,
+                                 onFailure: (error: any) => void) {
+        try {
+            let result = await axiosInstance
+                .get(`${AppSettings.API_ENDPOINT}/public/passwordRecovery/update?userEmail=${userEmail}&code=${code}&password=${password}`);
+            onSuccess(result.data);
+        } catch (error) {
+            onFailure(error);
         }
     }
 

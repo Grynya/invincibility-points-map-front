@@ -6,11 +6,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Header from "../components/Header/Header";
 import Copyright from "../components/Copyright";
-import {useSelector} from "react-redux";
-import {StoreState} from "../store/StoreState";
 import Loading from "../components/Loading";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import User from "../model/User";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import userService from "../service/UserService";
 import MapPoint from "../model/MapPoint";
@@ -18,30 +15,32 @@ import Box from "@mui/material/Box";
 import {Divider} from "@mui/material";
 import ResourceView from "../components/resource/ResourceView";
 import MapboxLikedPoints from "../components/Map/MapboxLikedPoint";
+import store from "../store/store";
+import Button from "@mui/material/Button";
+import {useNavigate} from "react-router-dom";
 
 export default function LikedPointsPage() {
-    const resources = useSelector((state: StoreState) => state.resources);
-    const [user, setUser] = useState<User>()
-    const [likedPoints, setLikedPoints] = useState<MapPoint[]>()
+    const [likedPoints, setLikedPoints] = useState<MapPoint[]>();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const userItem = localStorage.getItem("user")
-        if (userItem) {
-            setUser(JSON.parse(userItem));
-            if (user) {
-                userService.getLikedPoints(user.id,
-                    (likedPoints) => {
-                        setLikedPoints(likedPoints);
-                    },
-                    () => {
-                        console.log("Unable to fetch data")
-                    });
-            }
+        const user = store.getState().user;
+        console.log(store.getState())
+        if (user) {
+            userService.getLikedPoints(
+                user.id,
+                (likedPoints) => {
+                    setLikedPoints(likedPoints);
+                },
+                () => {
+                    console.log("Unable to fetch data");
+                }
+            );
         }
+    }, []); // Dependency array with user to trigger when user changes
 
-    })
     return (
-        resources === null ? <Loading/> :
+        likedPoints === null ? <Loading/> :
             <>
                 <CssBaseline/>
                 <Header open={false}/>
@@ -101,6 +100,9 @@ export default function LikedPointsPage() {
                                 </Container>
                             </Container>
                         ):"Не вдалося завантажити вподобані пункти"}
+                        <Button variant="contained" color="primary" style={{margin: 10}} onClick={() => navigate('/')}>
+                            На головну
+                        </Button>
                     </div>
                     <Copyright sx={{mt: 8, mb: 4}}/>
                 </Container>

@@ -13,7 +13,7 @@ import {useSelector} from "react-redux";
 import {StoreState} from "../store/StoreState";
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
-import {FormGroup, InputLabel} from "@mui/material";
+import {AlertTitle, FormGroup, InputLabel} from "@mui/material";
 import Loading from "../components/Loading";
 import Button from "@mui/material/Button";
 import {makeStyles} from "@material-ui/core/styles";
@@ -26,8 +26,10 @@ import Resource from "../model/Resource";
 import CreatePointRequest from "../payloads/request/CreatePointRequest";
 import dayjs, {Dayjs} from "dayjs";
 import ErrorAlert from "../components/alerts/ErrorAlert";
-import pointService from "../service/PointService";
-import User from "../model/User";
+import pointService from "../service/MapPointService";
+import store from "../store/store";
+import Alert from "@mui/material/Alert";
+import {useNavigate} from "react-router-dom";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -46,18 +48,12 @@ export default function CreatingPointPage() {
     const [selectedResources, setSelectedResources] = useState<Resource[]>([]);
     const [photos, setPhotos] = useState<FileList | null>(null);
     const classes = useStyles();
+    const [success, setSuccess] = useState({message: "", visible: false});
     const [error, setError] = useState({message: "", visible: false});
-    const [user, setUser] = useState<User>()
-
+    const user = store.getState().user;
     const [startDate, setStartDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'));
     const [endDate, setEndDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'))
-
-    useEffect(() => {
-        const userItem = localStorage.getItem("user")
-        if (userItem) {
-            setUser(JSON.parse(userItem))
-        }
-    }, [])
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState<CreatePointRequest>({
         name: "",
@@ -76,6 +72,7 @@ export default function CreatingPointPage() {
         console.log(formData)
         await pointService.createPoint(formData, photos, () => {
             console.log("Added mapPoint")
+            setSuccess({message: "Пункт додано", visible: true})
         }, (error) => {
             if (error instanceof Error)
                 setError({message: error.message, visible: true});
@@ -137,6 +134,10 @@ export default function CreatingPointPage() {
                         </Typography>
                         <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
                             <ErrorAlert error={error} setError={setError}/>
+                            {success.visible ?
+                                <Alert severity={"success"} sx={{mt: 3, mb: 3}}>
+                                    <AlertTitle><strong>{success.message}</strong></AlertTitle>
+                                </Alert> : null}
                             <TextField
                                 sx={{mt: 1, mb: 1}}
                                 margin="normal"
@@ -231,6 +232,13 @@ export default function CreatingPointPage() {
                                 sx={{mt: 3}}
                             >
                                 Додати пункт
+                            </Button>
+                            <Button
+                                fullWidth
+                                variant="contained"
+                                onClick={navigate("/")}
+                            >
+                                На головну
                             </Button>
                         </Box>
                     </div>

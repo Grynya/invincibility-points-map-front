@@ -6,6 +6,7 @@ import {ReactComponent as Logo} from "../../img/logo.svg";
 import AuthMenu from "./AuthMenu";
 import {styled, Theme, useTheme} from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
+import {useNavigate} from "react-router-dom";
 
 const drawerWidth = 540;
 
@@ -28,13 +29,14 @@ const AppBar = styled(MuiAppBar, {
 
 export default function Header({children, open}: {children?:ReactElement, open:boolean}) {
     const theme = useTheme();
+    const navigate = useNavigate();
     return (
         <AppBar position="relative"
                 open={open}
-                className="yellow-bottom-border black-color" theme={theme}>
+                className="yellow-bottom-border black-color" theme={theme} onClick={()=>navigate("/")}>
             <Toolbar>
                 {children}
-                <Link style={{textDecoration: 'none', color: 'inherit'}} href="/">
+                <Link style={{textDecoration: 'none', color: 'inherit'}}>
                     <Box display="flex" alignItems="center">
                         <Logo/>
                         <Typography variant="h5" style={{
