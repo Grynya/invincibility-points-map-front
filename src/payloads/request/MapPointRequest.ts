@@ -1,8 +1,7 @@
 import Coordinates from "../../model/Coordinates";
 
-export default interface PointRequest {
+export default interface MapPointRequest {
     sw: Coordinates;
     ne: Coordinates;
     zoom: number;
-    userId: number | null;
 }

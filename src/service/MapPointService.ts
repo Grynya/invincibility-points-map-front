@@ -1,5 +1,5 @@
 import {AppSettings} from "../AppSettings";
-import PointRequest from "../payloads/request/PointRequest";
+import MapPointRequest from "../payloads/request/MapPointRequest";
 import MapPoint from "../model/MapPoint"
 import CreatePointRequest from "../payloads/request/CreatePointRequest";
 import {CreatePointResponse} from "../payloads/response/CreatePointResponse";
@@ -8,8 +8,8 @@ import {ERating} from "../model/ERating"
 import axiosInstance from "./axiosInstance";
 
 class MapPointService {
-    async getPoints(pointRequest: PointRequest): Promise<MapPoint[]> {
-        return (await axiosInstance.post(`${AppSettings.API_ENDPOINT}/public/point/getAll`, pointRequest)).data;
+    async getPoints(mapPointRequest: MapPointRequest): Promise<MapPoint[]> {
+        return (await axiosInstance.post(`${AppSettings.API_ENDPOINT}/public/point/getAll`, mapPointRequest)).data;
     }
 
     async createPoint(createPointRequest: CreatePointRequest,
@@ -18,7 +18,6 @@ class MapPointService {
                       onFailure: (error: any) => void): Promise<void> {
         try {
                 if (!createPointRequest.userId) {
-                    console.log("User id is null");
                     return;
                 }
                 let createPointResponse: CreatePointResponse =

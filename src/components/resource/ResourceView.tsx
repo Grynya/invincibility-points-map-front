@@ -1,14 +1,17 @@
-import Tooltip from "@mui/material/Tooltip";
-import HelpIcon from "@mui/icons-material/Help";
-import * as React from "react";
-import {Typography} from "@material-ui/core";
 import Resource from "../../model/Resource";
+import React from 'react';
+import { Typography, Tooltip } from '@mui/material';
+import HelpIcon from "@mui/icons-material/Help";
 
-export default function ResourceView({resource}: { resource: Resource }) {
-    return <Typography>
-        {resource.name.toUpperCase()}
-        <Tooltip title={resource.description}>
-            <HelpIcon sx={{fontSize: 'small', ml: 1}}/>
-        </Tooltip>
-    </Typography>
+export default function ResourceView({ resource }: { resource: Resource }) {
+    return (
+        <React.Fragment key={resource.id}>
+            <Typography key={resource.id}>
+                {resource.id}. {resource.name.toUpperCase()}
+            </Typography>
+            <Tooltip title={resource.description}>
+                <HelpIcon sx={{ fontSize: "small", ml: 1 }} />
+            </Tooltip>
+        </React.Fragment>
+    );
 }

@@ -71,7 +71,6 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
         const bounds = map.getBounds();
         const zoom = map.getZoom();
         const points: MapPoint[] = await pointService.getPoints({
-            userId: 1,
             sw: {lng: bounds.getSouthWest().lng, lat: bounds.getSouthWest().lat},
             ne: {lng: bounds.getNorthEast().lng, lat: bounds.getNorthEast().lat},
             zoom: zoom

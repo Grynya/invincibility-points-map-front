@@ -20,8 +20,6 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 export default function SidebarAuthorizedContent({openedPoint, user}:
                                                      { openedPoint: MapPoint | null, user: User }) {
     const navigate = useNavigate();
-    // const [isLiked, setIsLiked] = useState(false);
-    // const [isDisliked, setIsDisliked] = useState(false);
     const [rating, setRating] = useState<ERating>();
     const [likedColor, setLikedColor] = useState("gray");
     const [dislikedColor, setDislikedColor] = useState("gray");
@@ -97,17 +95,17 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
         }
     };
     useEffect(() => {
+        setRating(ERating.NOT_RATED);
+        setLikedColor("gray");
+        setDislikedColor("gray");
+
         if (openedPoint) {
             pointService.getRating(openedPoint.id, user.id, (rating: ERating) => {
                 setRating(rating);
                 if (rating === ERating.LIKED) {
-                    // setIsLiked(true);
-                    // setLikedText("Вподобано");
                     setDislikedColor("gray");
                     setLikedColor("red");
                 } else if (rating === ERating.DISLIKED) {
-                    // setIsLiked(false);
-                    // setLikedText("Вподобати");
                     setLikedColor("gray");
                     setDislikedColor("black");
                 }
