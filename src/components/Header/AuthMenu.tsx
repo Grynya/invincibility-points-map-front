@@ -1,12 +1,12 @@
 import {ClassNameMap, Menu, MenuItem} from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {IconButton, Toolbar} from "@material-ui/core";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import useStyles from "./styles";
 import Logout from "./Logout";
-import store from "../../store/store";
+import {store} from "../../store/store";
 
 export default function AuthMenu() {
     const [anchorEl, setAnchorEl] = useState<any>(null);

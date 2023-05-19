@@ -68,7 +68,6 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     ERating.NOT_RATED,
                     () => {
                         setRating(ERating.NOT_RATED);
-                        console.log("do unlike");
                         setLikedColor("gray");
                     },
                     () => {
@@ -123,7 +122,12 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                 </Button>
                 <Button variant="outlined" style={{color: "red", border: "1px solid red", margin: 10}}
                         onClick={() => navigate("/likedPoints")}>
-                    Показати вподобані пункти
+                    Вподобані пункти
+                    <FavoriteIcon color={'inherit'}/>
+                </Button>
+                <Button variant="outlined" style={{color: "red", border: "1px solid red", margin: 10}}
+                        onClick={() => navigate("/likedPoints")}>
+                    Усі користувачі
                     <FavoriteIcon color={'inherit'}/>
                 </Button>
             </Box>
@@ -142,7 +146,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                                 display: 'flex', justifyContent: 'space-between',
                                 alignItems: 'center'
                             }}>
-                                <IconButton
+         а                       <IconButton
                                     onClick={handleLikePoint}
                                     size="small"
                                     sx={{

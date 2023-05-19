@@ -25,7 +25,7 @@ import CreatePointRequest from "../payloads/request/CreatePointRequest";
 import dayjs, {Dayjs} from "dayjs";
 import ErrorAlert from "../components/alerts/ErrorAlert";
 import pointService from "../service/MapPointService";
-import store from "../store/store";
+import {store} from "../store/store";
 import Alert from "@mui/material/Alert";
 import {useNavigate} from "react-router-dom";
 

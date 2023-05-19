@@ -15,7 +15,7 @@ import Box from "@mui/material/Box";
 import {Divider} from "@mui/material";
 import ResourceView from "../components/resource/ResourceView";
 import MapboxLikedPoints from "../components/Map/MapboxLikedPoint";
-import store from "../store/store";
+import {store} from "../store/store";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 

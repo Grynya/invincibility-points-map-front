@@ -2,7 +2,7 @@ import {AxiosResponse} from "axios";
 import {AppSettings} from "../AppSettings";
 import MapPoint from "../model/MapPoint";
 import {JwtResponse} from "../payloads/response/JwtResponse";
-import store from "../store/store";
+import {store} from "../store/store";
 import {changeUser} from "../store/actionCreators/changeUser";
 import axiosInstance from "./axiosInstance";
 
@@ -13,8 +13,8 @@ class UserService {
             const response: AxiosResponse<JwtResponse> =
                 await axiosInstance
                     .get(`${AppSettings.API_ENDPOINT}/user/info-by-access-token?accessToken=${accessToken}`);
-            const {id, name, surname, email, userStatus, isAdmin} = response.data;
-            store.dispatch(changeUser({id, name, surname, email, userStatus, isAdmin}))
+            const {id, name, surname, email, userStatus, roles} = response.data;
+            store.dispatch(changeUser({id, name, surname, email, userStatus, roles}))
             onSuccess();
         } catch (error) {
             onFailure(error)

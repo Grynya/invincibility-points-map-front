@@ -1,6 +1,6 @@
 import {AxiosResponse, HttpStatusCode} from 'axios';
 import {AppSettings} from "../AppSettings";
-import store from "../store/store"
+import {store} from "../store/store"
 import {Store} from 'redux';
 import {JwtResponse} from "../payloads/response/JwtResponse";
 import {JwtRefreshResponse} from "../payloads/response/JwtRefreshResponse";
@@ -44,8 +44,8 @@ class AuthService {
                     password,
                 });
 
-            const {accessToken, refreshToken, expiresIn, id, name, surname, email, userStatus, isAdmin} = response.data;
-            store.dispatch(changeUser({id, name, surname, email, userStatus, isAdmin}));
+            const {accessToken, refreshToken, expiresIn, id, name, surname, email, userStatus, roles} = response.data;
+            store.dispatch(changeUser({id, name, surname, email, userStatus, roles}));
             store.dispatch(changeToken({
                 accessToken: accessToken,
                 refreshToken: refreshToken

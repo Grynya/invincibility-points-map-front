@@ -13,7 +13,7 @@ import {Divider} from "@mui/material";
 import MapPoint from "../model/MapPoint";
 import SidebarContent from "./sidebarContent/SidebarContent";
 import SidebarAuthorizedContent from "./sidebarContent/SidebarAuthorizedContent";
-import store from "../store/store";
+import {store} from "../store/store";
 
 const drawerWidth = 540;
 

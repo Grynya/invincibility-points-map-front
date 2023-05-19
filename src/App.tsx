@@ -17,17 +17,19 @@ import LikedPointsPage from "./views/LikedPointsPage";
 import PasswordRecoveryEmailPage from "./views/password_recovery/PasswordRecoveryEmailPage";
 import PasswordRecoveryCodePage from "./views/password_recovery/PasswordRecoveryCodePage";
 import PasswordRecoveryUpdatingPage from "./views/password_recovery/PasswordRecoveryUpdatingPage";
-import store from "./store/store";
+import {store} from "./store/store";
 
 export default function App() {
 
-    function successLocation(position:any) {
-        const { longitude, latitude } = position.coords;
+    function successLocation(position: any) {
+        const {longitude, latitude} = position.coords;
         store.dispatch(changeLocation([longitude, latitude]))
     }
+
     function errorLocation() {
         console.log("Unable to get current location.")
     }
+
     useEffect(() => {
         const fetchData = async () => {
             const data: Keys = await new KeyService().getKeys();
@@ -45,19 +47,19 @@ export default function App() {
         });
     });
     return (
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/" element={<MainPage/>}/>
-                    <Route path="/errorVerification" element={<ErrorVerificationPage/>}/>
-                    <Route path="/successVerification" element={<SuccessVerificationPage/>}/>
-                    <Route path="/login" element={<LoginPage/>}/>
-                    <Route path="/registration" element={<RegistrationPage/>}/>
-                    <Route path="/passwordRecovery" element={<PasswordRecoveryEmailPage/>}/>
-                    <Route path="/passwordRecoveryCode" element={<PasswordRecoveryCodePage/>}/>
-                    <Route path="/passwordRecoveryUpdate" element={<PasswordRecoveryUpdatingPage/>}/>
-                    <Route path="/addpoint" element={<CreatingPointPage/>}/>
-                    <Route path="/likedPoints" element={<LikedPointsPage/>}/>
-                </Routes>
-            </BrowserRouter>
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<MainPage/>}/>
+                <Route path="/errorVerification" element={<ErrorVerificationPage/>}/>
+                <Route path="/successVerification" element={<SuccessVerificationPage/>}/>
+                <Route path="/login" element={<LoginPage/>}/>
+                <Route path="/registration" element={<RegistrationPage/>}/>
+                <Route path="/passwordRecovery" element={<PasswordRecoveryEmailPage/>}/>
+                <Route path="/passwordRecoveryCode" element={<PasswordRecoveryCodePage/>}/>
+                <Route path="/passwordRecoveryUpdate" element={<PasswordRecoveryUpdatingPage/>}/>
+                <Route path="/addpoint" element={<CreatingPointPage/>}/>
+                <Route path="/likedPoints" element={<LikedPointsPage/>}/>
+            </Routes>
+        </BrowserRouter>
     )
 }

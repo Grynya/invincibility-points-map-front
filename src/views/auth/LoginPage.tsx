@@ -62,7 +62,7 @@ export default function LoginPage() {
                             required
                             fullWidth
                             id="email"
-                            label="Email Address"
+                            label="Email"
                             name="email"
                             autoComplete="email"
                             autoFocus
@@ -74,7 +74,7 @@ export default function LoginPage() {
                             required
                             fullWidth
                             name="password"
-                            label="Password"
+                            label="Пароль"
                             type="password"
                             id="password"
                             autoComplete="current-password"

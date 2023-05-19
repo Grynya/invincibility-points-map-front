@@ -1,5 +1,5 @@
 import {AppSettings} from "../AppSettings";
-import store from "../store/store";
+import {store} from "../store/store";
 import axios from "axios";
 
 class PhotoService {
