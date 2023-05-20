@@ -1,9 +1,8 @@
 import React, {useEffect, useRef, useState} from "react";
-import mapboxgl, {IControl, LngLatLike, Map, Marker} from "mapbox-gl";
+import mapboxgl, {LngLatLike, Map, Marker} from "mapbox-gl";
 import {InputLabel} from "@mui/material";
 import {useSelector} from "react-redux";
 import {StoreState} from "../../store/StoreState";
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import getAddress from "./getAdressString";
 
 interface Props {
@@ -15,7 +14,6 @@ const MapboxLikedPoints: React.FC<Props> = ({coordinates}) => {
     const [map, setMap] = useState<Map | null>(null);
     const markerRef = useRef<Marker | null>(null);
     const mapboxAccessToken = useSelector((state: StoreState) => state.mapboxAccessToken);
-    const controlRef = useRef<IControl | null>(null);
     const [addressString, setAddressString] = useState<string | null>(null);
 
     useEffect(() => {
@@ -52,23 +50,6 @@ const MapboxLikedPoints: React.FC<Props> = ({coordinates}) => {
                     getAddress(mapboxAccessToken, markerRef.current!.getLngLat(), setAddressString);
 
                 });
-
-                controlRef.current = new MapboxGeocoder({
-                    accessToken: mapboxgl.accessToken,
-                    mapboxgl: mapboxgl,
-                    countries: 'ua',
-                    marker: false
-                });
-                // @ts-ignore
-                controlRef.current.on('result', e => {
-                    markerRef.current?.setLngLat(e.result.center);
-                });
-                if (controlRef.current && !mapInstance.hasControl(controlRef.current as IControl)) {
-                    mapInstance.addControl(controlRef.current);
-                }
-                if (controlRef.current && !mapInstance.hasControl(controlRef.current as IControl)) {
-                    mapInstance.addControl(controlRef.current);
-                }
             };
 
             if (!map) initializeMap({setMap, mapContainer});
@@ -80,7 +61,7 @@ const MapboxLikedPoints: React.FC<Props> = ({coordinates}) => {
             <InputLabel sx={{mt: 1, mb: 1, fontWeight:"bold", color: "#000000"}}>Адреса: {addressString}</InputLabel>
             <div
                 ref={(el) => (mapContainer.current = el)}
-                style={{width: "100%", height: "50vh"}}/>
+                style={{height: "20vh"}}/>
         </div>
     );
 };

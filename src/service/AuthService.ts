@@ -121,7 +121,6 @@ class AuthService {
             store.dispatch(changeToken(null));
             store.dispatch(changeTokenInfo(null));
             // eslint-disable-next-line no-restricted-globals
-            location.reload();
             afterLogout();
         } catch (error) {
             console.log("Unable to logout");

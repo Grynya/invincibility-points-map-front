@@ -13,11 +13,12 @@ import {ResourceService} from "./service/ResourceService";
 import {changeLocation} from "./store/actionCreators/changeLocation";
 import ErrorVerificationPage from "./views/verification/ErrorVerificationPage";
 import SuccessVerificationPage from "./views/verification/SuccessVerificationPage";
-import LikedPointsPage from "./views/LikedPointsPage";
+import LikedPointsPage from "./views/likedPoints/LikedPointsPage";
 import PasswordRecoveryEmailPage from "./views/password_recovery/PasswordRecoveryEmailPage";
 import PasswordRecoveryCodePage from "./views/password_recovery/PasswordRecoveryCodePage";
 import PasswordRecoveryUpdatingPage from "./views/password_recovery/PasswordRecoveryUpdatingPage";
 import {store} from "./store/store";
+import UsersPage from "./views/UsersPage";
 
 export default function App() {
 
@@ -59,6 +60,7 @@ export default function App() {
                 <Route path="/passwordRecoveryUpdate" element={<PasswordRecoveryUpdatingPage/>}/>
                 <Route path="/addpoint" element={<CreatingPointPage/>}/>
                 <Route path="/likedPoints" element={<LikedPointsPage/>}/>
+                <Route path="/users" element={<UsersPage/>}/>
             </Routes>
         </BrowserRouter>
     )

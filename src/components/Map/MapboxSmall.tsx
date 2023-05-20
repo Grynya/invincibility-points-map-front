@@ -63,6 +63,7 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
                 controlRef.current = new MapboxGeocoder({
                     accessToken: mapboxgl.accessToken,
                     mapboxgl: mapboxgl,
+                    language: 'ukr',
                     countries: 'ua',
                     marker: false
                 });

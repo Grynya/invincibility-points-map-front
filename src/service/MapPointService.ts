@@ -11,6 +11,9 @@ class MapPointService {
     async getPoints(mapPointRequest: MapPointRequest): Promise<MapPoint[]> {
         return (await axiosInstance.post(`${AppSettings.API_ENDPOINT}/public/point/getAll`, mapPointRequest)).data;
     }
+    async getPointsByUser(userId: number): Promise<MapPoint[]> {
+        return (await axiosInstance.get(`${AppSettings.API_ENDPOINT}/point/getAllByUser?userId=${userId}`)).data;
+    }
 
     async createPoint(createPointRequest: CreatePointRequest,
                       photos: FileList | null,

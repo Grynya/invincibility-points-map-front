@@ -9,5 +9,4 @@ export default interface User {
     code: string;
     userStatus: EUserStatus;
     roles: string[];
-
 }

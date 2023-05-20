@@ -5,8 +5,20 @@ import {JwtResponse} from "../payloads/response/JwtResponse";
 import {store} from "../store/store";
 import {changeUser} from "../store/actionCreators/changeUser";
 import axiosInstance from "./axiosInstance";
+import User from "../model/User";
 
 class UserService {
+    async getAllUsers(onSuccess: (users: User[]) => void,
+                      onFailure: (error: any) => void): Promise<void> {
+        try {
+            let result =
+                await axiosInstance
+                    .get(`${AppSettings.API_ENDPOINT}/admin/getAllUsers`);
+            onSuccess(result.data);
+        } catch (error) {
+            onFailure(error);
+        }
+    }
     async setUserByAccessToken(accessToken: string, onFailure: (error: any) => void,
                                onSuccess: () => void): Promise<void> {
         try {

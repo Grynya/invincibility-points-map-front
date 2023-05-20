@@ -16,6 +16,8 @@ import pointService from "../../service/MapPointService";
 import {ERating} from "../../model/ERating";
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
+import GroupIcon from '@mui/icons-material/Group';
+import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 
 export default function SidebarAuthorizedContent({openedPoint, user}:
                                                      { openedPoint: MapPoint | null, user: User }) {
@@ -57,6 +59,9 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                 );
             }
         }
+    }
+    const isAdmin = (user: User): boolean => {
+        return user.roles.includes("ROLE_ADMIN");
     }
     const handleLikePoint = () => {
         if (openedPoint) {
@@ -116,20 +121,29 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
 
     return (
         <React.Fragment>
-            <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: "column"}}>
-                <Button variant="contained" color="primary" style={{margin: 10}} onClick={() => navigate('/addpoint')}>
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+                margin: '0 25%'
+            }}>
+                <Button variant="outlined" size="large" style={{color: 'blue', border: '1px solid blue', width: '100%'}}
+                        onClick={() => navigate('/addpoint')}>
                     Додати пункт на мапу
+                    <AddLocationAltIcon color="inherit"/>
                 </Button>
-                <Button variant="outlined" style={{color: "red", border: "1px solid red", margin: 10}}
-                        onClick={() => navigate("/likedPoints")}>
+                <Button variant="outlined" size="large" style={{color: 'red', border: '1px solid red', width: '100%'}}
+                        onClick={() => navigate('/likedPoints')}>
                     Вподобані пункти
-                    <FavoriteIcon color={'inherit'}/>
+                    <FavoriteIcon color="inherit"/>
                 </Button>
-                <Button variant="outlined" style={{color: "red", border: "1px solid red", margin: 10}}
-                        onClick={() => navigate("/likedPoints")}>
+                {isAdmin(user) ? <Button variant="outlined" size="large"
+                                         style={{color: 'black', border: '1px solid black', width: '100%'}}
+                                         onClick={() => navigate('/users')}>
                     Усі користувачі
-                    <FavoriteIcon color={'inherit'}/>
-                </Button>
+                    <GroupIcon color="inherit"/>
+                </Button> : null}
             </Box>
             {!openedPoint ?
                 <Container>
@@ -146,7 +160,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                                 display: 'flex', justifyContent: 'space-between',
                                 alignItems: 'center'
                             }}>
-         а                       <IconButton
+                                <IconButton
                                     onClick={handleLikePoint}
                                     size="small"
                                     sx={{

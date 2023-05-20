@@ -47,6 +47,7 @@ body {
 }
 .mapboxgl-canvas{
     position: absolute;
+    width:auto!important;
 }
 /*.mapboxgl-control-container {*/
 /*    position: fixed;*/
