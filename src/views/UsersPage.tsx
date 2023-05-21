@@ -39,7 +39,7 @@ export default function UsersPage() {
     }, []);
 
     const handleShowPoints = async (user: User) => {
-        setCurrentName(user.surname+" "+user.name);
+        setCurrentName(user.surname + " " + user.name);
         setCurrentPoints(await mapPointService.getPointsByUser(user.id));
         setOpen(true);
     };
@@ -48,6 +48,13 @@ export default function UsersPage() {
         setCurrentName("");
         setOpen(false);
     };
+
+    const handleDeleteMapPoint = async (pointId: number) => {
+        await mapPointService.deleteMapPoint(pointId,
+            () => {
+                setCurrentPoints(currentPoints?.filter(point => point.id !== pointId));
+            }, () => console.log("Unable to delete"));
+    }
     return (
         users === null ? <Loading/> :
             <>
@@ -104,11 +111,16 @@ export default function UsersPage() {
                                 </Avatar>
                                 <Typography component="h1" variant="h5">Пункти {currentName}
                                 </Typography>
-                                {currentPoints?.length===0?
+                                {currentPoints?.length === 0 ?
                                     <Typography variant="subtitle1">Пункти відсутні</Typography>
-                                    :null}
-                            {currentPoints ? currentPoints.map((point, idx) =>
-                            <MapPointView point={point} key={idx}/>) : "Не вдалося завантажити пункти"}
+                                    : null}
+                                {currentPoints ? currentPoints.map((point, idx) =>
+                                    <MapPointView point={point} key={idx} children={
+                                        <Button variant="contained" color="error" style={{margin: 10}}
+                                                onClick={() => handleDeleteMapPoint(point.id)}>
+                                            Видалити пункт
+                                        </Button>
+                                    }/>) : "Не вдалося завантажити пункти"}
                             </Container>
                         </Dialog>
                         <Button variant="contained" color="primary" style={{margin: 10}} onClick={() => navigate('/')}>

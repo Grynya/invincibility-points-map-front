@@ -11,8 +11,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Header from "../components/Header/Header";
 import {Divider} from "@mui/material";
 import MapPoint from "../model/MapPoint";
-import SidebarContent from "./sidebarContent/SidebarContent";
-import SidebarAuthorizedContent from "./sidebarContent/SidebarAuthorizedContent";
+import SidebarContent from "./sidebar_content/SidebarContent";
+import SidebarAuthorizedContent from "./sidebar_content/SidebarAuthorizedContent";
 import {store} from "../store/store";
 
 const drawerWidth = 540;

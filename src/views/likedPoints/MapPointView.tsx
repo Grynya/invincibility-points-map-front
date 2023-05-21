@@ -8,7 +8,7 @@ import {Divider} from "@mui/material";
 import ResourceView from "../../components/resource/ResourceView";
 import MapboxLikedPoints from "../../components/Map/MapboxLikedPoint";
 
-export default function MapPointView({point}:{point: MapPoint}) {
+export default function MapPointView({point, children}:{point: MapPoint, children?: React.ReactNode}) {
     return (
         <Container component="main" maxWidth="xl" key={point.id}>
             <Container style={{margin: '10px 0'}}>
@@ -44,6 +44,7 @@ export default function MapPointView({point}:{point: MapPoint}) {
                     <Typography style={{color: "gray"}}>
                         <span>Відсутні фото</span>
                     </Typography> : null}
+                {children}
             </Container>
         </Container>
     );

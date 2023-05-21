@@ -66,6 +66,17 @@ class MapPointService {
             onFailure(error);
         }
     }
+
+    async deleteMapPoint(pointId: number,
+                   onSuccess: () => void,
+                   onFailure: (error: any) => void) {
+        try {
+            await axiosInstance.delete(`${AppSettings.API_ENDPOINT}/admin/point?pointId=${pointId}`);
+            onSuccess();
+        } catch (error) {
+            onFailure(error);
+        }
+    }
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export

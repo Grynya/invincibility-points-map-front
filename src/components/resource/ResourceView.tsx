@@ -8,10 +8,11 @@ export default function ResourceView({ resource }: { resource: Resource }) {
         <React.Fragment key={resource.id}>
             <Typography key={resource.id}>
                 {resource.id}. {resource.name.toUpperCase()}
-            </Typography>
-            <Tooltip title={resource.description}>
-                <HelpIcon sx={{ fontSize: "small", ml: 1 }} />
+                <Tooltip title={resource.description}>
+                <HelpIcon sx={{ fontSize: "small"}} />
             </Tooltip>
+            </Typography>
+
         </React.Fragment>
     );
 }
