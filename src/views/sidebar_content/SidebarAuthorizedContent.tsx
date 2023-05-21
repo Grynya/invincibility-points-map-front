@@ -18,6 +18,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import GroupIcon from '@mui/icons-material/Group';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
+import authService from "../../service/AuthService";
 
 export default function SidebarAuthorizedContent({openedPoint, user}:
                                                      { openedPoint: MapPoint | null, user: User }) {
@@ -60,9 +61,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
             }
         }
     }
-    const isAdmin = (user: User): boolean => {
-        return user.roles.includes("ROLE_ADMIN");
-    }
+
     const handleLikePoint = () => {
         if (openedPoint) {
             //delete like
@@ -138,7 +137,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     Вподобані пункти
                     <FavoriteIcon color="inherit"/>
                 </Button>
-                {isAdmin(user) ? <Button variant="outlined" size="large"
+                {authService.isAdmin(user) ? <Button variant="outlined" size="large"
                                          style={{color: 'black', border: '1px solid black', width: '100%'}}
                                          onClick={() => navigate('/users')}>
                     Усі користувачі

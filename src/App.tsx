@@ -19,6 +19,8 @@ import PasswordRecoveryCodePage from "./views/password_recovery/PasswordRecovery
 import PasswordRecoveryUpdatingPage from "./views/password_recovery/PasswordRecoveryUpdatingPage";
 import {store} from "./store/store";
 import UsersPage from "./views/UsersPage";
+import ProtectedUserRoute from "./protectedRoute/ProtectedUserRoute";
+import ProtectedAdminRoute from "./protectedRoute/ProtectedAdminRoute";
 
 export default function App() {
 
@@ -58,9 +60,15 @@ export default function App() {
                 <Route path="/passwordRecovery" element={<PasswordRecoveryEmailPage/>}/>
                 <Route path="/passwordRecoveryCode" element={<PasswordRecoveryCodePage/>}/>
                 <Route path="/passwordRecoveryUpdate" element={<PasswordRecoveryUpdatingPage/>}/>
-                <Route path="/addpoint" element={<CreatingPointPage/>}/>
-                <Route path="/likedPoints" element={<LikedPointsPage/>}/>
-                <Route path="/users" element={<UsersPage/>}/>
+                <Route path="addpoint" element={<ProtectedUserRoute/>}>
+                    <Route path="/addpoint" element={<CreatingPointPage/>}/>
+                </Route>
+                <Route path="likedPoints" element={<ProtectedUserRoute/>}>
+                    <Route path="/likedPoints" element={<LikedPointsPage/>}/>
+                </Route>
+                <Route path="users" element={<ProtectedAdminRoute/>}>
+                    <Route path="/users" element={<UsersPage/>}/>
+                </Route>
             </Routes>
         </BrowserRouter>
     )

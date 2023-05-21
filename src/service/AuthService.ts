@@ -1,4 +1,4 @@
-import {AxiosResponse, HttpStatusCode} from 'axios';
+import axios, {AxiosResponse, HttpStatusCode} from 'axios';
 import {AppSettings} from "../AppSettings";
 import {store} from "../store/store"
 import {Store} from 'redux';
@@ -10,6 +10,7 @@ import {changeUser} from "../store/actionCreators/changeUser";
 import {changeTokenInfo} from "../store/actionCreators/changeTokenInfo";
 import {changeToken} from "../store/actionCreators/changeToken";
 import axiosInstance from "./axiosInstance";
+import User from "../model/User";
 
 
 class AuthService {
@@ -168,6 +169,14 @@ class AuthService {
         }
     }
 
+    async isLoggedIn(accessToken: string):Promise<boolean> {
+        return (await axios
+            .get(`${AppSettings.API_ENDPOINT}/public/isLoggedIn?token=${accessToken}`)).data;
+    }
+
+    isAdmin (user: User): boolean {
+        return user.roles.includes("ROLE_ADMIN");
+    }
 }
 
 const authService = new AuthService();
