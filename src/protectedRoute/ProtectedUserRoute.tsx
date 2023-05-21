@@ -15,7 +15,7 @@ const ProtectedUserRoute = () => {
                 if (token && user) {
                     const isUserLogged = await authService.isLoggedIn(token.accessToken);
                     setState(isUserLogged ? 'loggedin' : 'redirect');
-                }
+                }else setState('redirect');
             } catch {
                 setState('redirect');
             }

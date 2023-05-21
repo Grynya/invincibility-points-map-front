@@ -169,9 +169,15 @@ class AuthService {
         }
     }
 
-    async isLoggedIn(accessToken: string):Promise<boolean> {
-        return (await axios
-            .get(`${AppSettings.API_ENDPOINT}/public/isLoggedIn?token=${accessToken}`)).data;
+    async isLoggedIn(accessToken: string): Promise<boolean> {
+        try {
+            const response: AxiosResponse<boolean> = await axios.get(`${AppSettings.API_ENDPOINT}/public/isLoggedIn?token=${accessToken}`);
+            return response.data;
+        } catch (error) {
+            // Handle error
+            console.error(error);
+            return false;
+        }
     }
 
     isAdmin (user: User): boolean {
