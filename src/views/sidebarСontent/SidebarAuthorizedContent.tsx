@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {Divider} from "@mui/material";
 import Box from "@mui/material/Box";
 import MapPoint from "../../model/MapPoint";
@@ -19,25 +19,73 @@ import ThumbDownIcon from '@mui/icons-material/ThumbDown';
 import GroupIcon from '@mui/icons-material/Group';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import authService from "../../service/AuthService";
+import {RatingResponse} from "../../payloads/response/RatingResponse";
 
 export default function SidebarAuthorizedContent({openedPoint, user}:
                                                      { openedPoint: MapPoint | null, user: User }) {
     const navigate = useNavigate();
-    const [rating, setRating] = useState<ERating>();
-    const [likedColor, setLikedColor] = useState("gray");
-    const [dislikedColor, setDislikedColor] = useState("gray");
+    const [ratingInfo, setRatingInfo] = useState<RatingResponse>({
+        eRating: ERating.NOT_RATED,
+        numOfLikes: 0,
+        numOfDislikes: 0
+    });
+    const likedColor = useRef("gray");
+    const dislikedColor = useRef("gray");
+    const changeRatingInfo = (rating: ERating.LIKED | ERating.DISLIKED, action: 'add' | 'remove') => {
+        if (rating === ERating.LIKED) {
+            if (action === 'add') {
+                if (ratingInfo.eRating===ERating.DISLIKED){
+                    setRatingInfo(prevState => ({
+                        ...prevState,
+                        numOfDislikes: prevState.numOfDislikes - 1
+                    }));
+                }
+                setRatingInfo(prevState => ({
+                    ...prevState,
+                    eRating: ERating.LIKED,
+                    numOfLikes: prevState.numOfLikes + 1
+                }));
+            } else {
+                setRatingInfo(prevState => ({
+                    ...prevState,
+                    eRating: ERating.LIKED,
+                    numOfLikes: prevState.numOfLikes - 1
+                }));
+            }
+        } else {
+            if (action === 'add') {
+                if (ratingInfo.eRating===ERating.LIKED){
+                    setRatingInfo(prevState => ({
+                        ...prevState,
+                        numOfLikes: prevState.numOfLikes - 1
+                    }));
+                }
+                setRatingInfo(prevState => ({
+                    ...prevState,
+                    eRating: ERating.DISLIKED,
+                    numOfDislikes: prevState.numOfDislikes + 1
+                }));
+            } else if (action === 'remove') {
+                setRatingInfo(prevState => ({
+                    ...prevState,
+                    eRating: ERating.DISLIKED,
+                    numOfDislikes: prevState.numOfDislikes - 1
+                }));
+            }
+        }
+    };
 
     const handleDislikePoint = () => {
         if (openedPoint) {
             //delete dislike
-            if (rating === ERating.DISLIKED) {
+            if (ratingInfo.eRating === ERating.DISLIKED) {
                 pointService.rate(
                     openedPoint.id,
                     user.id,
                     ERating.NOT_RATED,
                     () => {
-                        setRating(ERating.NOT_RATED);
-                        setDislikedColor("gray");
+                        changeRatingInfo(ERating.DISLIKED, 'remove');
+                        dislikedColor.current="gray";
                     },
                     () => {
                         console.log("Unable to delete dislike of point");
@@ -50,9 +98,9 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     user.id,
                     ERating.DISLIKED,
                     () => {
-                        setRating(ERating.DISLIKED);
-                        setLikedColor("gray");
-                        setDislikedColor("black");
+                        changeRatingInfo(ERating.DISLIKED, 'add');
+                        likedColor.current="gray";
+                        dislikedColor.current="black";
                     },
                     () => {
                         console.log("Unable to dislike point");
@@ -65,14 +113,14 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
     const handleLikePoint = () => {
         if (openedPoint) {
             //delete like
-            if (rating === ERating.LIKED) {
+            if (ratingInfo.eRating === ERating.LIKED) {
                 pointService.rate(
                     openedPoint.id,
                     user.id,
                     ERating.NOT_RATED,
                     () => {
-                        setRating(ERating.NOT_RATED);
-                        setLikedColor("gray");
+                        changeRatingInfo(ERating.LIKED, 'remove');
+                        likedColor.current="gray";
                     },
                     () => {
                         console.log("Unable to delete like of point");
@@ -85,10 +133,9 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     user.id,
                     ERating.LIKED,
                     () => {
-                        setRating(ERating.LIKED);
-                        console.log("do like")
-                        setDislikedColor("gray");
-                        setLikedColor("red");
+                        changeRatingInfo(ERating.LIKED, 'add');
+                        dislikedColor.current="gray";
+                        likedColor.current="red";
                     },
                     () => {
                         console.log("Unable to like point");
@@ -98,18 +145,20 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
         }
     };
     useEffect(() => {
-        setRating(ERating.NOT_RATED);
-        setLikedColor("gray");
-        setDislikedColor("gray");
+        setRatingInfo({
+            eRating: ERating.NOT_RATED,
+            numOfLikes: 0,
+            numOfDislikes: 0
+        });
+        dislikedColor.current="gray";
+        likedColor.current="gray";
         if (openedPoint) {
-            pointService.getRating(openedPoint.id, user.id, (rating: ERating) => {
-                setRating(rating);
-                if (rating === ERating.LIKED) {
-                    setDislikedColor("gray");
-                    setLikedColor("red");
-                } else if (rating === ERating.DISLIKED) {
-                    setLikedColor("gray");
-                    setDislikedColor("black");
+            pointService.getRating(openedPoint.id, user.id, (ratingResponse: RatingResponse) => {
+                setRatingInfo(ratingResponse);
+                if (ratingResponse.eRating === ERating.LIKED) {
+                    likedColor.current="red";
+                } else if (ratingResponse.eRating === ERating.DISLIKED) {
+                    dislikedColor.current="black"
                 }
             }, () => {
                 console.log("Unable to load like of point")
@@ -137,8 +186,8 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     <FavoriteIcon color="inherit"/>
                 </Button>
                 {authService.isAdmin(user) ? <Button variant="outlined" size="large"
-                                         style={{color: 'black', border: '1px solid black', width: '100%'}}
-                                         onClick={() => navigate('/users')}>
+                                                     style={{color: 'black', border: '1px solid black', width: '100%'}}
+                                                     onClick={() => navigate('/users')}>
                     Усі користувачі
                     <GroupIcon color="inherit"/>
                 </Button> : null}
@@ -166,9 +215,9 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                                             color: 'red',
                                             backgroundColor: 'transparent'
                                         },
-                                        color: likedColor
+                                        color: likedColor.current
                                     }}
-                                ><ThumbUpIcon/>
+                                >{ratingInfo.numOfLikes} <ThumbUpIcon/>
                                 </IconButton>
                                 <IconButton
                                     onClick={handleDislikePoint}
@@ -178,9 +227,9 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                                             color: 'black',
                                             backgroundColor: 'transparent'
                                         },
-                                        color: dislikedColor
+                                        color: dislikedColor.current
                                     }}
-                                ><ThumbDownIcon/>
+                                >{ratingInfo.numOfDislikes} <ThumbDownIcon/>
                                 </IconButton>
                             </Box>
 

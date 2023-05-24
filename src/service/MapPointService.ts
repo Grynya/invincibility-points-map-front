@@ -6,6 +6,7 @@ import {CreatePointResponse} from "../payloads/response/CreatePointResponse";
 import photoService from "./PhotoService";
 import {ERating} from "../model/ERating"
 import axiosInstance from "./axiosInstance";
+import {RatingResponse} from "../payloads/response/RatingResponse";
 
 class MapPointService {
     async getPoints(mapPointRequest: MapPointRequest): Promise<MapPoint[]> {
@@ -55,7 +56,7 @@ class MapPointService {
         }
     }
     async getRating(pointId: number, userId: number,
-                  onSuccess: (rating: ERating) => void,
+                  onSuccess: (rating: RatingResponse) => void,
                   onFailure: (error: any) => void): Promise<void> {
         try {
                 let result =
