@@ -15,7 +15,7 @@ interface Props {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
+const MapBox: React.FC<Props> = ({ setOpenedPoint, open, setOpen}) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<Map | null>(null);
     const [control, setControl] = useState<IControl | null>(null);
@@ -91,15 +91,16 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
             if (control) map.addControl(control);
         }
     }, [map, control]);
-    const [selectedFeatureId, setSelectedFeatureId] = useState(null); // Track the ID of the selected feature
+    const selectedFeatureIdRef = useRef(null);
 
     useEffect(() => {
-        if (map && !open){
+        if (map && !open) {
             map.setLayoutProperty('points', 'icon-image', 'placeholder');
+            selectedFeatureIdRef.current=null;
         }
     }, [open])
 
-        async function loadPoints(map: Map) {
+    async function loadPoints(map: Map) {
         const bounds = map.getBounds();
         const zoom = map.getZoom();
         const points: MapPoint[] = await pointService.getPoints({
@@ -130,20 +131,21 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
                         coordinates: JSON.parse(clickedPoint.coordinates),
                         photos: JSON.parse(clickedPoint.photos),
                         resources: JSON.parse(clickedPoint.resources),
-                        userId: clickedPoint.usetId
+                        userId: clickedPoint.userId
                     });
+                    selectedFeatureIdRef.current = clickedPoint.id; // Update the mutable reference
+
                     setOpen(true);
-                    console.log(clickedPoint.id, selectedFeatureId)
-                    if (selectedFeatureId !== null) {
+                    if (selectedFeatureIdRef.current !== null) {
                         map.setFeatureState(
-                            { source: 'points', id: selectedFeatureId },
-                            { selected: false }
+                            {source: 'points', id: selectedFeatureIdRef.current},
+                            {selected: false}
                         );
                     }
 
                     map.setFeatureState(
-                        { source: 'points', id: clickedPoint.id },
-                        { selected: true }
+                        {source: 'points', id: clickedPoint.id},
+                        {selected: true}
                     );
                     map.setLayoutProperty('points', 'icon-image', [
                         'match',
@@ -152,9 +154,6 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
                         'placeholder-on-hover',
                         'placeholder'
                     ]);
-
-                    // Update the selected feature ID
-                    setSelectedFeatureId(clickedPoint.id);
                 }
             });
             map.on('mouseenter', 'points',
@@ -193,8 +192,13 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
                 }
             },
             layout: {
-                'icon-image': 'placeholder', // Use the image ID specified in map.addImage()
-                'icon-size': 0.1,
+                'icon-image': [
+                    'case',
+                    ['!=', ['get', 'id'], selectedFeatureIdRef.current],
+                    'placeholder',
+                    'placeholder-on-hover'
+                ],
+                'icon-size': 0.03,
                 'icon-allow-overlap': true
             },
             paint: {}

@@ -192,7 +192,8 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     <Divider/>
                     <Container style={{margin: '10px 0'}}>
                         <Typography variant="h6"><b>Наявні ресурси</b></Typography>
-                        {openedPoint.resources.map((resource) => <ResourceView resource={resource}/>)}
+                        {openedPoint.resources.map((resource, key) =>
+                            <ResourceView resource={resource} key={key}/>)}
                         {openedPoint.resources.length === 0 ?
                             <Typography style={{"color": "gray"}}>
                                 <span>Відсутні ресурси</span>

@@ -21,7 +21,7 @@ export default function SidebarContent({openedPoint}:{openedPoint: MapPoint | nu
                     <Container component="main" maxWidth="xl" key={openedPoint.id}>
                         <Container style={{margin: '10px 0'}}>
                             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
-                                <Typography variant="h3">{openedPoint.name}</Typography>
+                                <Typography variant="h3">{openedPoint.id} {openedPoint.name}</Typography>
                             </Box>
                             <Typography variant="h6">{openedPoint.description}</Typography>
                             <Typography variant="h6">{`Години роботи: ${openedPoint.hoursOfWork}`}</Typography>
@@ -30,7 +30,8 @@ export default function SidebarContent({openedPoint}:{openedPoint: MapPoint | nu
                         <Divider/>
                         <Container style={{margin: '10px 0'}}>
                             <Typography variant="h6"><b>Наявні ресурси</b></Typography>
-                            {openedPoint.resources.map((resource) => <ResourceView resource={resource}/>)}
+                            {openedPoint.resources.map((resource, idx) =>
+                                <ResourceView key={idx} resource={resource}/>)}
                             {openedPoint.resources.length === 0 ?
                                 <Typography style={{"color": "gray"}}>
                                     <span>Відсутні ресурси</span>

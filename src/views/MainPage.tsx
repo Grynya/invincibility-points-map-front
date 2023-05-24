@@ -98,7 +98,6 @@ export default function MainPage() {
             <Main open={open} theme={theme}>
                 <Mapbox setOpen={setOpen} open={open} setOpenedPoint={setOpenedPoint}/>
             </Main>
-            {/*<ResourceFilter userId={user?.id} open={open} />*/}
         </React.Fragment>
     );
 }
