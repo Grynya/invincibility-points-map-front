@@ -9,10 +9,13 @@ import MapPoint from "../../model/MapPoint";
 
 interface Props {
     setOpenedPoint: React.Dispatch<React.SetStateAction<MapPoint | null>>;
+
+    open: boolean;
+
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
+const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<Map | null>(null);
     const [control, setControl] = useState<IControl | null>(null);
@@ -28,6 +31,28 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
                 center: location,
                 maxBounds: [[22.15, 44.39], [40.22, 52.37]],
                 zoom: 12
+            });
+            map.loadImage('img/placeholder.png', (error, image) => {
+                if (error) {
+                    console.error('Failed to load the image:', error);
+                } else {
+                    // @ts-ignore
+                    map.addImage('placeholder', image);
+                    map.once('style.load', () => {
+                        loadPoints(map);
+                    });
+                }
+            });
+            map.loadImage('img/placeholder-on-hover.png', (error, image) => {
+                if (error) {
+                    console.error('Failed to load the image:', error);
+                } else {
+                    // @ts-ignore
+                    map.addImage('placeholder-on-hover', image);
+                    map.once('style.load', () => {
+                        loadPoints(map);
+                    });
+                }
             });
             setControl(new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
@@ -66,8 +91,15 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
             if (control) map.addControl(control);
         }
     }, [map, control]);
+    const [selectedFeatureId, setSelectedFeatureId] = useState(null); // Track the ID of the selected feature
 
-    async function loadPoints(map: Map) {
+    useEffect(() => {
+        if (map && !open){
+            map.setLayoutProperty('points', 'icon-image', 'placeholder');
+        }
+    }, [open])
+
+        async function loadPoints(map: Map) {
         const bounds = map.getBounds();
         const zoom = map.getZoom();
         const points: MapPoint[] = await pointService.getPoints({
@@ -101,10 +133,35 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
                         userId: clickedPoint.usetId
                     });
                     setOpen(true);
+                    console.log(clickedPoint.id, selectedFeatureId)
+                    if (selectedFeatureId !== null) {
+                        map.setFeatureState(
+                            { source: 'points', id: selectedFeatureId },
+                            { selected: false }
+                        );
+                    }
+
+                    map.setFeatureState(
+                        { source: 'points', id: clickedPoint.id },
+                        { selected: true }
+                    );
+                    map.setLayoutProperty('points', 'icon-image', [
+                        'match',
+                        ['get', 'id'],
+                        clickedPoint.id,
+                        'placeholder-on-hover',
+                        'placeholder'
+                    ]);
+
+                    // Update the selected feature ID
+                    setSelectedFeatureId(clickedPoint.id);
                 }
-
-
             });
+            map.on('mouseenter', 'points',
+                () => map.getCanvas().style.cursor = 'pointer');
+
+            map.on('mouseleave', 'points',
+                () => map.getCanvas().style.cursor = '');
         }
 
         const pointsToDraw: Feature<Point>[] = points.map(point => ({
@@ -124,29 +181,10 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
                 resources: point.resources
             },
         }));
-        map.on('mouseenter', 'points', function (e) {
-            const features = map.queryRenderedFeatures(e.point, {layers: ['points']});
-            if (!features.length) {
-                return;
-            }
-            map.getCanvas().style.cursor = 'pointer';
-            const hoveredFeature = features[0];
-            if (hoveredFeature && hoveredFeature.properties) {
-                map.setPaintProperty('points', 'circle-color', [
-                    'match',
-                    ['get', 'id'], hoveredFeature.properties.id,
-                    'red',
-                    'blue'
-                ]);
-            }
-        });
-        map.on('mouseleave', 'points', function () {
-            map.getCanvas().style.cursor = '';
-            map.setPaintProperty('points', 'circle-color', 'blue'); // Change this to the normal color
-        });
+
         map.addLayer({
             id: 'points',
-            type: 'circle',
+            type: 'symbol',
             source: {
                 type: 'geojson',
                 data: {
@@ -154,12 +192,14 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, setOpen}) => {
                     features: pointsToDraw
                 }
             },
-            interactive: true,
-            paint: {
-                'circle-radius': 12,
-                'circle-color': 'blue'
-            }
+            layout: {
+                'icon-image': 'placeholder', // Use the image ID specified in map.addImage()
+                'icon-size': 0.1,
+                'icon-allow-overlap': true
+            },
+            paint: {}
         });
+
     }
 
     return (

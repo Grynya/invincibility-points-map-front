@@ -15,6 +15,7 @@ import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import AuthService from "../../service/AuthService";
 import ErrorAlert from "../../components/alerts/ErrorAlert";
+import {HttpStatusCode} from "axios";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -26,12 +27,14 @@ export default function LoginPage() {
         event.preventDefault();
         if (username && password) {
             await AuthService.signin(username, password, (error) => {
-                setError({message: error.response.data.message, visible: true});
-            }, ()=>{
+                if (error.response.status === HttpStatusCode.Unauthorized) {
+                    setError({message: "Не правильно вказаний логін або пароль", visible: true});
+                } else setError({message: error.response.data.message, visible: true});
+            }, () => {
                 navigate("/");
             })
         } else {
-            setError({message: "No username or password", visible: true});
+            setError({message: "Не вказано логін або пароль", visible: true});
         }
     }
 

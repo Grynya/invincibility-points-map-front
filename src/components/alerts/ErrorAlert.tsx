@@ -34,7 +34,7 @@ const ErrorAlert = ({ error, setError }: Props) => {
                                 <CloseIcon fontSize="inherit" />
                             </IconButton>
                         }
-                        sx={{ mb: 2, mt:3 }}
+                        sx={{ mb: 2, mt:2 }}
                     >
                         {error.message}
                     </Alert>

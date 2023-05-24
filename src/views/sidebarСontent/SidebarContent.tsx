@@ -7,7 +7,6 @@ import Resource from "../../model/Resource";
 import Container from '@mui/material/Container';
 import ResourceView from "../../components/resource/ResourceView";
 
-
 export default function SidebarContent({openedPoint}:{openedPoint: MapPoint | null}) {
 
     return (
@@ -48,7 +47,7 @@ export default function SidebarContent({openedPoint}:{openedPoint: MapPoint | nu
                                     style={{width: '300px', height: 'auto'}}
                                 />
                             ))}
-                            {openedPoint.resources.length === 0 ?
+                            {openedPoint.photos.length === 0 ?
                                 <Typography style={{color: "gray"}}>
                                     <span>Відсутні фото</span>
                                 </Typography> : null}

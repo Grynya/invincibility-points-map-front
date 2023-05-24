@@ -1,4 +1,4 @@
-import {ClassNameMap, Menu, MenuItem} from "@mui/material";
+import {ClassNameMap, Menu, MenuItem, Typography} from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import React, {useState} from "react";
@@ -7,7 +7,8 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import useStyles from "./styles";
 import Logout from "./Logout";
 import {store} from "../../store/store";
-
+import Avatar from "@mui/material/Avatar";
+import PersonPinIcon from '@mui/icons-material/PersonPin';
 export default function AuthMenu() {
     const [anchorEl, setAnchorEl] = useState<any>(null);
     const user = store.getState().user
@@ -40,10 +41,12 @@ export default function AuthMenu() {
                     </MenuItem>
                 </a> : null}
             {user ?
-                <div className="profile-desc">
-                    <p className="bold-text">{user.name}</p>
-                    <p className="bold-text">{user.surname}</p>
-                    <p className="light-text">{user.email}</p>
+                <div className="profile-desc" style={{ display: 'flex', flexDirection:"column", alignItems: 'center' }}>
+                    <Avatar className="blue-bg" sx={{m: 1}}>
+                        <PersonPinIcon/>
+                    </Avatar>
+                    <Typography variant="h6" style={{fontWeight: 600}}>{user.name} {user.surname}</Typography>
+                    <Typography variant="subtitle1">{user.email}</Typography>
                     <hr/>
                     <Logout/>
                 </div> : null}

@@ -14,9 +14,9 @@ const Logout: React.FC = () => {
     };
 
     return (
-        <MenuItem onClick={handleLogout}>
-            <PersonAddIcon style={{margin: 5}}/>
-            Вийти
+        <MenuItem onClick={handleLogout} >
+            <PersonAddIcon/>
+            <span>Вийти</span>
         </MenuItem>
     );
 };

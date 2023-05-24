@@ -101,7 +101,6 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
         setRating(ERating.NOT_RATED);
         setLikedColor("gray");
         setDislikedColor("gray");
-
         if (openedPoint) {
             pointService.getRating(openedPoint.id, user.id, (rating: ERating) => {
                 setRating(rating);
@@ -154,7 +153,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                 <Container component="main" maxWidth="xl" key={openedPoint.id}>
                     <Container style={{margin: '10px 0'}}>
                         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
-                            <Typography variant="h3">{openedPoint.id}. {openedPoint.name}</Typography>
+                            <Typography variant="h3">{openedPoint.name}</Typography>
                             <Box sx={{
                                 display: 'flex', justifyContent: 'space-between',
                                 alignItems: 'center'
@@ -210,7 +209,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                                 style={{width: '300px', height: 'auto'}}
                             />
                         ))}
-                        {openedPoint.resources.length === 0 ?
+                        {openedPoint.photos.length === 0 ?
                             <Typography style={{color: "gray"}}>
                                 <span>Відсутні фото</span>
                             </Typography> : null}

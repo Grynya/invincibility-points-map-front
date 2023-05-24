@@ -46,6 +46,7 @@ class UserService {
             onFailure(error);
         }
     }
+
 }
 
 // eslint-disable-next-line import/no-anonymous-default-export

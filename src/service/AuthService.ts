@@ -39,7 +39,7 @@ class AuthService {
     async signin(username: string, password: string, onFailure: (error: any) => void,
                  onSuccess: () => void): Promise<void> {
         try {
-            const response: AxiosResponse<JwtResponse> = await axiosInstance
+            const response: AxiosResponse<JwtResponse> = await axios
                 .post(`${AppSettings.API_ENDPOINT}/public/signin`, {
                     username,
                     password,
@@ -51,18 +51,17 @@ class AuthService {
                 accessToken: accessToken,
                 refreshToken: refreshToken
             }));
-            console.log(store.getState())
             this.scheduleTokenRefresh(expiresIn);
             onSuccess();
         } catch (error) {
-            onFailure(error)
+                onFailure(error)
         }
     }
 
     async signup(signUpRequest: SignUpRequest, onFailure: (error: any) => void,
                  onSuccess: () => void): Promise<void> {
         try {
-            const response: AxiosResponse<JwtResponse> = await axiosInstance
+            const response: AxiosResponse<JwtResponse> = await axios
                 .post(`${AppSettings.API_ENDPOINT}/public/signup`, signUpRequest);
             if (response.status === HttpStatusCode.Ok) onSuccess();
         } catch (error) {
@@ -76,7 +75,7 @@ class AuthService {
             const token = store.getState().token;
             if (token) {
                 let response: AxiosResponse<JwtRefreshResponse> =
-                    await axiosInstance.post(`${AppSettings.API_ENDPOINT}/public/refreshtoken`,
+                    await axios.post(`${AppSettings.API_ENDPOINT}/public/refreshtoken`,
                         {
                             refreshToken: token.refreshToken,
                         });
@@ -99,7 +98,7 @@ class AuthService {
             clearTimeout(this.refreshTimeout);
         }
 
-        const timeoutDuration = expiresIn - 60;
+        const timeoutDuration = expiresIn - 2000;
 
         this.refreshTimeout = setTimeout(() => {
             this.doRefreshToken();
@@ -133,7 +132,7 @@ class AuthService {
                                     onSuccess: (likedPoints: MapPoint[]) => void,
                                     onFailure: (error: any) => void): Promise<void> {
         try {
-            let result = await axiosInstance
+            let result = await axios
                 .get(`${AppSettings.API_ENDPOINT}/public/passwordRecovery/sendEmail?userEmail=${userEmail}`);
             onSuccess(result.data);
         } catch (error) {
@@ -146,9 +145,8 @@ class AuthService {
                                     onSuccess: (isCorrectCode: boolean) => void,
                                     onFailure: (error: any) => void) {
         try {
-            let result = await axiosInstance
+            let result = await axios
                 .get(`${AppSettings.API_ENDPOINT}/public/passwordRecovery/checkCode?userEmail=${userEmail}&code=${code}`);
-            console.log(result);
             onSuccess(result.data);
         } catch (error) {
             onFailure(error);

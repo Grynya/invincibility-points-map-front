@@ -40,7 +40,7 @@ export default function MapPointView({point, children}:{point: MapPoint, childre
                         style={{width: '300px', height: 'auto'}}
                     />
                 ))}
-                {point.resources.length === 0 ?
+                {point.photos.length === 0 ?
                     <Typography style={{color: "gray"}}>
                         <span>Відсутні фото</span>
                     </Typography> : null}
