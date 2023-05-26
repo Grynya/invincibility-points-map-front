@@ -6,7 +6,6 @@ import MapPoint from "../../model/MapPoint";
 import {Typography} from "@material-ui/core";
 import Resource from "../../model/Resource";
 import Container from '@mui/material/Container';
-import ResourceView from "../resource/ResourceView";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import {useNavigate} from "react-router-dom";
 import User from "../../model/User";
@@ -20,12 +19,11 @@ import authService from "../../service/AuthService";
 import {RatingResponse} from "../../payloads/response/RatingResponse";
 import Paper from '@mui/material/Paper';
 import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import getAddress from "../map/getAdressString";
 import {store} from "../../store/store";
 import {LngLat} from "mapbox-gl";
+import MenuListItem from "./MenuListItem";
+import MapPointDesc from "./MapPointDesc";
 
 export default function SidebarAuthorizedContent({openedPoint, user}:
                                                      { openedPoint: MapPoint | null, user: User }) {
@@ -37,55 +35,37 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
     });
     const likedColor = useRef("gray");
     const dislikedColor = useRef("gray");
-    const [addressString, setAddressString] = useState<string|null>(null);
+    const [addressString, setAddressString] = useState<string | null>(null);
     const changeRatingInfo = (rating: ERating.LIKED | ERating.DISLIKED, action: 'add' | 'remove') => {
         if (rating === ERating.LIKED) {
-            if (action === 'add') {
-                if (ratingInfo.eRating === ERating.DISLIKED) {
-                    setRatingInfo(prevState => ({
-                        ...prevState,
-                        numOfDislikes: prevState.numOfDislikes - 1
-                    }));
-                }
-                setRatingInfo(prevState => ({
-                    ...prevState,
-                    eRating: ERating.LIKED,
-                    numOfLikes: prevState.numOfLikes + 1
-                }));
-            } else {
-                setRatingInfo(prevState => ({
-                    ...prevState,
-                    eRating: ERating.LIKED,
-                    numOfLikes: prevState.numOfLikes - 1
-                }));
-            }
+            const numOfLikes = action === 'add' ? ratingInfo.numOfLikes + 1 : ratingInfo.numOfLikes - 1;
+            const numOfDislikes = action === 'add' && ratingInfo.eRating === ERating.DISLIKED ?
+                ratingInfo.numOfDislikes - 1 : ratingInfo.numOfDislikes;
+            setRatingInfo(prevState => ({
+                ...prevState,
+                eRating: ERating.LIKED,
+                numOfLikes,
+                numOfDislikes
+            }));
         } else {
-            if (action === 'add') {
-                if (ratingInfo.eRating === ERating.LIKED) {
-                    setRatingInfo(prevState => ({
-                        ...prevState,
-                        numOfLikes: prevState.numOfLikes - 1
-                    }));
-                }
-                setRatingInfo(prevState => ({
-                    ...prevState,
-                    eRating: ERating.DISLIKED,
-                    numOfDislikes: prevState.numOfDislikes + 1
-                }));
-            } else if (action === 'remove') {
-                setRatingInfo(prevState => ({
-                    ...prevState,
-                    eRating: ERating.DISLIKED,
-                    numOfDislikes: prevState.numOfDislikes - 1
-                }));
-            }
+            const numOfDislikes =
+                action === 'add' ? ratingInfo.numOfDislikes + 1 : ratingInfo.numOfDislikes - 1;
+            const numOfLikes =
+                action === 'add' && ratingInfo.eRating === ERating.LIKED ?
+                    ratingInfo.numOfLikes - 1 : ratingInfo.numOfLikes;
+            setRatingInfo(prevState => ({
+                ...prevState,
+                eRating: ERating.DISLIKED,
+                numOfLikes,
+                numOfDislikes
+            }));
         }
     };
 
     const handleDislikePoint = () => {
         if (openedPoint) {
             //delete dislike
-            if (ratingInfo.numOfDislikes>0 && ratingInfo.eRating === ERating.DISLIKED) {
+            if (ratingInfo.numOfDislikes > 0 && ratingInfo.eRating === ERating.DISLIKED) {
                 pointService.rate(
                     openedPoint.id,
                     user.id,
@@ -120,7 +100,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
     const handleLikePoint = () => {
         if (openedPoint) {
             //delete like
-            if (ratingInfo.numOfLikes>0 && ratingInfo.eRating === ERating.LIKED) {
+            if (ratingInfo.numOfLikes > 0 && ratingInfo.eRating === ERating.LIKED) {
                 pointService.rate(
                     openedPoint.id,
                     user.id,
@@ -151,12 +131,11 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
             }
         }
     };
-    useEffect( ()=>{
+    useEffect(() => {
         const mapboxAccessToken = store.getState().mapboxAccessToken
-        console.log(openedPoint?.coordinates)
         if (mapboxAccessToken && openedPoint) {
             getAddress(mapboxAccessToken, new LngLat(openedPoint.coordinates.lng, openedPoint.coordinates.lat))
-                .then(result=>setAddressString(result));
+                .then(result => setAddressString(result));
         }
     }, [openedPoint]);
     useEffect(() => {
@@ -192,32 +171,21 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
             }}>
                 <Paper sx={{width: 540, maxWidth: '100%', p: '0 30px'}}>
                     <MenuList>
-                        <MenuItem onClick={() => navigate('/addpoint')} style={{height: '80px'}}>
-                            <ListItemIcon>
-                                <AddLocationAltIcon fontSize="large"/>
-                            </ListItemIcon>
-                            <ListItemText>
-                                <Typography style={{fontSize: 'x-large'}}>Додати пункт на мапу</Typography>
-                            </ListItemText>
-                        </MenuItem>
-                        <MenuItem onClick={() => navigate('/likedPoints')} style={{height: '80px'}}>
-                            <ListItemIcon>
-                                <FavoriteIcon fontSize="large"/>
-                            </ListItemIcon>
-                            <ListItemText>
-                                <Typography style={{fontSize: 'x-large'}}>Вподобані пункти</Typography>
-                            </ListItemText>
-                        </MenuItem>
+                        <MenuListItem onClick={() => navigate('/addpoint')}
+                                      text={"Додати пункт на мапу"}
+                                      icon={<AddLocationAltIcon fontSize="large"/>}
+                        />
+                        <MenuListItem onClick={() => navigate('/likedPoints')}
+                                      text={"Вподобані пункти"}
+                                      icon={<FavoriteIcon fontSize="large"/>}
+                        />
                         {authService.isAdmin(user) ?
-                            <><Divider/>
-                                <MenuItem onClick={() => navigate('/users')} style={{height: '80px'}}>
-                                <ListItemIcon>
-                                    <GroupIcon fontSize="large"/>
-                                </ListItemIcon>
-                                <ListItemText>
-                                    <Typography style={{fontSize: 'x-large'}}>Усі користувачі</Typography>
-                                </ListItemText>
-                            </MenuItem></> : null}
+                            <>
+                                <Divider/>
+                                <MenuListItem onClick={() => navigate('/addpoint')}
+                                              text={"Усі користувачі"}
+                                              icon={<GroupIcon fontSize="large"/>}/>
+                            </> : null}
                     </MenuList>
                 </Paper>
 
@@ -251,40 +219,8 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                                 </IconButton>
                             </Box>
                         </Box>
-                        <Typography variant="h6">{openedPoint.description}</Typography>
                     </Container>
-                    <Divider/>
-                    <Container style={{margin: '10px 0'}}>
-                        <Typography variant="h6"><b>Години роботи:</b> {openedPoint.hoursOfWork}</Typography>
-                        <Typography variant="h6"><b>Телефон:</b> {openedPoint.phone}</Typography>
-                        <Typography variant="h6"><b>Адреса:</b> {addressString}</Typography>
-                    </Container>
-                    <Divider/>
-                    <Container style={{margin: '10px 0'}}>
-                        <Typography variant="h6"><b>Наявні ресурси</b></Typography>
-                        {openedPoint.resources.map((resource, key) =>
-                            <ResourceView resource={resource} key={key}/>)}
-                        {openedPoint.resources.length === 0 ?
-                            <Typography style={{"color": "gray"}}>
-                                <span>Відсутні ресурси</span>
-                            </Typography> : null}
-                    </Container>
-                    <Divider/>
-                    <Container style={{margin: '10px 0'}}>
-                        <Typography variant="h6"><b>Фото</b></Typography>
-                        {openedPoint.photos.map((photo) => (
-                            <img
-                                key={photo.id}
-                                src={"data:image/png;base64," + photo.fileContent}
-                                alt={photo.fileName}
-                                style={{width: '300px', height: 'auto'}}
-                            />
-                        ))}
-                        {openedPoint.photos.length === 0 ?
-                            <Typography style={{color: "gray"}}>
-                                <span>Відсутні фото</span>
-                            </Typography> : null}
-                    </Container>
+                    <MapPointDesc mapPoint={openedPoint} addressString={addressString}/>
                 </Container> : null}
         </React.Fragment>
     )
