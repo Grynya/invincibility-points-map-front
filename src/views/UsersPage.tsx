@@ -4,15 +4,14 @@ import Avatar from '@mui/material/Avatar';
 import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Header from "../components/Header/Header";
+import Header from "../components/header/Header";
 import Loading from "../components/Loading";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import userService from "../service/UserService";
 import Box from "@mui/material/Box";
-import {Divider, Input} from "@mui/material";
+import {Divider} from "@mui/material";
 import {store} from "../store/store";
 import Button from "@mui/material/Button";
-import {useNavigate} from "react-router-dom";
 import User from "../model/User";
 import GroupIcon from "@mui/icons-material/Group";
 import Link from '@mui/material/Link';
@@ -20,12 +19,13 @@ import MapPoint from "../model/MapPoint";
 import mapPointService from "../service/MapPointService";
 import MapPointView from "./likedPoints/MapPointView";
 import Dialog from '@mui/material/Dialog';
+import TextField from "@mui/material/TextField";
+import ToMainButton from "../components/ToMainButton";
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>();
     const [currentName, setCurrentName] = useState<string>("");
     const [currentPoints, setCurrentPoints] = useState<MapPoint[]>();
-    const navigate = useNavigate();
     const [open, setOpen] = useState<boolean>(false)
 
     const handleShowPoints = async (user: User) => {
@@ -89,21 +89,20 @@ export default function UsersPage() {
                             alignItems: 'center',
                         }}
                     >
+                        <ToMainButton/>
                         <Avatar sx={{m: 1, backgroundColor: 'black'}}>
                             <GroupIcon/>
                         </Avatar>
                         <Typography component="h1" variant="h3">
                             Користувачі
                         </Typography>
-                        <Box>
-                        <Input
+                        <TextField
                             type="text"
-                            sx={{width:'100%', fontSize:"20px", margin: '20px 0'}}
+                            sx={{width:'40%', margin: '20px 0'}}
                             placeholder="Ім'я та прізвище"
                             value={searchQuery}
                             onChange={handleSearch}
                         />
-                        </Box>
                         {filteredUsers && filteredUsers.length===0?
                             <div style={{paddingTop:'25%'}}>
                                 <Typography variant="h6">Користувачі відсутні</Typography>
@@ -158,9 +157,6 @@ export default function UsersPage() {
                                     }/>) : "Не вдалося завантажити пункти"}
                             </Container>
                         </Dialog>
-                        <Button variant="contained" color="primary" style={{margin: 10}} onClick={() => navigate('/')}>
-                            На головну
-                        </Button>
                     </div>
 
                 </Container>

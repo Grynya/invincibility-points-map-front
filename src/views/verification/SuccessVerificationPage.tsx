@@ -3,7 +3,7 @@ import {useEffect, useState} from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import {useNavigate} from "react-router-dom";
-import Header from "../../components/Header/Header";
+import Header from "../../components/header/Header";
 import {Alert, AlertTitle} from '@mui/material';
 import authService from "../../service/AuthService";
 import Button from "@mui/material/Button";

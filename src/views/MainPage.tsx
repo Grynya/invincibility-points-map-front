@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import Header from "../components/Header/Header";
+import Header from "../components/header/Header";
 import {Divider} from "@mui/material";
 import MapPoint from "../model/MapPoint";
 import SidebarContent from "../components/sidebarСontent/SidebarContent";

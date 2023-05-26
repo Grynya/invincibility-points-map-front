@@ -57,7 +57,6 @@ const MapBox: React.FC<Props> = ({ setOpenedPoint, open, setOpen}) => {
             setControl(new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
                 mapboxgl: mapboxgl,
-                language: 'ukr',
                 countries: 'ua'
             }));
             map.on('load', function () {

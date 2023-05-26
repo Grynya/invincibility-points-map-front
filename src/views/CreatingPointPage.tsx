@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import AddLocationIcon from '@mui/icons-material/AddLocation';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Header from "../components/Header/Header";
+import Header from "../components/header/Header";
 import Copyright from "../components/Copyright";
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider';
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs';
@@ -27,7 +27,7 @@ import ErrorAlert from "../components/alerts/ErrorAlert";
 import pointService from "../service/MapPointService";
 import {store} from "../store/store";
 import Alert from "@mui/material/Alert";
-import {useNavigate} from "react-router-dom";
+import ToMainButton from "../components/ToMainButton";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -51,7 +51,6 @@ export default function CreatingPointPage() {
     const user = store.getState().user;
     const [startDate, setStartDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'));
     const [endDate, setEndDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'))
-    const navigate = useNavigate();
 
     const [formData, setFormData] = useState<CreatePointRequest>({
         name: "",
@@ -67,7 +66,6 @@ export default function CreatingPointPage() {
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        console.log(formData)
         await pointService.createPoint(formData, photos,
             () => setSuccess({message: "Пункт додано", visible: true}),
             (error) => setError({message: error.response.data, visible: true}));
@@ -120,6 +118,7 @@ export default function CreatingPointPage() {
                             alignItems: 'center',
                         }}
                     >
+                        <ToMainButton/>
                         <Avatar className="yellow-bg" sx={{m: 1}}>
                             <AddLocationIcon/>
                         </Avatar>
@@ -130,15 +129,6 @@ export default function CreatingPointPage() {
                             <Alert severity={"success"} sx={{mt: 3, mb: 3}}>
                                 <AlertTitle><strong>{success.message}</strong></AlertTitle>
                             </Alert> : null}
-                        <Box>
-                        <Button
-                            fullWidth
-                            variant="outlined"
-                            sx={{mt: 3, mb: 3}}
-                            onClick={() => navigate("/")}
-                        >
-                            На головну
-                        </Button></Box>
                         {!success.visible ?
                             <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
                                 <TextField

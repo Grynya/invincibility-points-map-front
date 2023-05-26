@@ -1,13 +1,12 @@
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
-import {Divider} from "@mui/material";
+import {Divider, IconButton} from "@mui/material";
 import Box from "@mui/material/Box";
 import MapPoint from "../../model/MapPoint";
 import {Typography} from "@material-ui/core";
 import Resource from "../../model/Resource";
 import Container from '@mui/material/Container';
 import ResourceView from "../resource/ResourceView";
-import IconButton from "@mui/material/IconButton";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import {useNavigate} from "react-router-dom";
 import User from "../../model/User";
@@ -86,7 +85,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
     const handleDislikePoint = () => {
         if (openedPoint) {
             //delete dislike
-            if (ratingInfo.eRating === ERating.DISLIKED) {
+            if (ratingInfo.numOfDislikes>0 && ratingInfo.eRating === ERating.DISLIKED) {
                 pointService.rate(
                     openedPoint.id,
                     user.id,
@@ -121,7 +120,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
     const handleLikePoint = () => {
         if (openedPoint) {
             //delete like
-            if (ratingInfo.eRating === ERating.LIKED) {
+            if (ratingInfo.numOfLikes>0 && ratingInfo.eRating === ERating.LIKED) {
                 pointService.rate(
                     openedPoint.id,
                     user.id,
@@ -156,10 +155,8 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
         const mapboxAccessToken = store.getState().mapboxAccessToken
         console.log(openedPoint?.coordinates)
         if (mapboxAccessToken && openedPoint) {
-            getAddress(mapboxAccessToken, new LngLat(openedPoint.coordinates.lng, openedPoint.coordinates.lat)).then((result)=>{
-                console.log(result)
-                setAddressString(result);
-            })
+            getAddress(mapboxAccessToken, new LngLat(openedPoint.coordinates.lng, openedPoint.coordinates.lat))
+                .then(result=>setAddressString(result));
         }
     }, [openedPoint]);
     useEffect(() => {
@@ -210,16 +207,17 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                             <ListItemText>
                                 <Typography style={{fontSize: 'x-large'}}>Вподобані пункти</Typography>
                             </ListItemText>
-                        </MenuItem><br/>
+                        </MenuItem>
                         {authService.isAdmin(user) ?
-                            <MenuItem onClick={() => navigate('/users')} style={{height: '80px'}}>
+                            <><Divider/>
+                                <MenuItem onClick={() => navigate('/users')} style={{height: '80px'}}>
                                 <ListItemIcon>
                                     <GroupIcon fontSize="large"/>
                                 </ListItemIcon>
                                 <ListItemText>
                                     <Typography style={{fontSize: 'x-large'}}>Усі користувачі</Typography>
                                 </ListItemText>
-                            </MenuItem> : null}
+                            </MenuItem></> : null}
                     </MenuList>
                 </Paper>
 
@@ -242,29 +240,16 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                                 <IconButton
                                     onClick={handleLikePoint}
                                     size="small"
-                                    sx={{
-                                        '&:hover': {
-                                            color: 'red',
-                                            backgroundColor: 'transparent'
-                                        },
-                                        color: likedColor.current
-                                    }}
+                                    style={{color: likedColor.current}}
                                 >{ratingInfo.numOfLikes} <ThumbUpIcon/>
                                 </IconButton>
                                 <IconButton
                                     onClick={handleDislikePoint}
                                     size="small"
-                                    sx={{
-                                        '&:hover': {
-                                            color: 'black',
-                                            backgroundColor: 'transparent'
-                                        },
-                                        color: dislikedColor.current
-                                    }}
+                                    style={{color: dislikedColor.current}}
                                 >{ratingInfo.numOfDislikes} <ThumbDownIcon/>
                                 </IconButton>
                             </Box>
-
                         </Box>
                         <Typography variant="h6">{openedPoint.description}</Typography>
                     </Container>

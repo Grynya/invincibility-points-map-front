@@ -30,15 +30,15 @@ export default function AuthMenu() {
         >
             {!user ?
                 <a href="/login" className="no-text-decoration">
-                    <MenuItem>
-                        <LoginIcon style={{margin: 5}}/>
-                        Увійти
+                    <MenuItem style={{height: '80px'}}>
+                        <LoginIcon fontSize="large"/>
+                        <Typography style={{fontSize: 'large'}}>Увійти</Typography>
                     </MenuItem></a> : null}
             {!user ?
                 <a href="/registration" className="no-text-decoration">
-                    <MenuItem>
-                        <PersonAddIcon style={{margin: 5}}/>
-                        Зареєструватись
+                    <MenuItem style={{height: '80px'}}>
+                        <PersonAddIcon fontSize="large"/>
+                        <Typography style={{fontSize: 'large'}}>Зареєструватись</Typography>
                     </MenuItem>
                 </a> : null}
             {user ?

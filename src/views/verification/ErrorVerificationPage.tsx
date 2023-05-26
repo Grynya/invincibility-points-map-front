@@ -3,7 +3,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import {useLocation} from "react-router-dom";
 import Button from "@mui/material/Button";
-import Header from "../../components/Header/Header";
+import Header from "../../components/header/Header";
 import {Alert, AlertTitle} from '@mui/material';
 import {useEffect, useState} from "react";
 

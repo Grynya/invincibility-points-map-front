@@ -9,7 +9,7 @@ import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Copyright from "../../components/Copyright";
-import Header from "../../components/Header/Header";
+import Header from "../../components/header/Header";
 import AuthService from "../../service/AuthService";
 import ErrorAlert from "../../components/alerts/ErrorAlert";
 import Alert from "@mui/material/Alert";

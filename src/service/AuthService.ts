@@ -112,14 +112,14 @@ class AuthService {
     }
 
     signout = async (afterLogout: () => void): Promise<void> => {
+        store.dispatch(changeUser(null));
+        store.dispatch(changeToken(null));
+        store.dispatch(changeTokenInfo(null));
         try {
             await axiosInstance.get(`${AppSettings.API_ENDPOINT}/signout`);
             if (this.refreshTimeout) {
                 clearTimeout(this.refreshTimeout);
             }
-            store.dispatch(changeUser(null));
-            store.dispatch(changeToken(null));
-            store.dispatch(changeTokenInfo(null));
             // eslint-disable-next-line no-restricted-globals
             afterLogout();
         } catch (error) {

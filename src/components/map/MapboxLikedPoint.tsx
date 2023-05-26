@@ -63,7 +63,7 @@ const MapboxLikedPoints: React.FC<Props> = ({coordinates}) => {
             <InputLabel sx={{mt: 1, mb: 1, fontWeight:"bold", color: "#000000"}}>Адреса: {addressString}</InputLabel>
             <div
                 ref={(el) => (mapContainer.current = el)}
-                style={{height: "20vh"}}/>
+                style={{height: "30vh"}}/>
         </div>
     );
 };
