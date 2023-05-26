@@ -98,7 +98,7 @@ class AuthService {
             clearTimeout(this.refreshTimeout);
         }
 
-        const timeoutDuration = expiresIn - 2000;
+        const timeoutDuration = expiresIn - 60000;
 
         this.refreshTimeout = setTimeout(() => {
             this.doRefreshToken();
@@ -170,6 +170,7 @@ class AuthService {
     async isLoggedIn(accessToken: string): Promise<boolean> {
         try {
             const response: AxiosResponse<boolean> = await axios.get(`${AppSettings.API_ENDPOINT}/public/isLoggedIn?token=${accessToken}`);
+            if ( !response.data) store.dispatch(changeUser(null));
             return response.data;
         } catch (error) {
             // Handle error

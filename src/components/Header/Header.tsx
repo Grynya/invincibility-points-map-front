@@ -33,13 +33,16 @@ export default function Header({children, open}: {children?:ReactElement, open:b
     return (
         <AppBar position="relative"
                 open={open}
-                className="yellow-bottom-border black-color" theme={theme} onClick={()=>navigate("/")}>
+                className="yellow-bottom-border black-color" theme={theme}
+                >
             <Toolbar>
                 {children}
                 <Link style={{textDecoration: 'none', color: 'inherit'}}>
-                    <Box display="flex" alignItems="center">
+                    <Box display="flex" alignItems="center"
+                         style={{cursor:"pointer"}}
+                         onClick={()=>navigate("/")}>
                         <Logo/>
-                        <Typography variant="h5" style={{
+                        <Typography variant="h4" style={{
                             fontWeight: "bold",
                             fontFamily: "'Khula', sans-serif"
                         }} className="blue-color">Пункти незламності</Typography>

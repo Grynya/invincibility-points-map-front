@@ -26,6 +26,7 @@ export default function AuthMenu() {
             keepMounted
             open={Boolean(anchorEl)}
             onClose={handleClose}
+            style={{minWidth: '900px'}}
         >
             {!user ?
                 <a href="/login" className="no-text-decoration">
@@ -45,8 +46,8 @@ export default function AuthMenu() {
                     <Avatar className="blue-bg" sx={{m: 1}}>
                         <PersonPinIcon/>
                     </Avatar>
-                    <Typography variant="h6" style={{fontWeight: 600}}>{user.name} {user.surname}</Typography>
-                    <Typography variant="subtitle1">{user.email}</Typography>
+                    <Typography variant="h5" style={{fontWeight: 600}}>{user.name} {user.surname}</Typography>
+                    <Typography variant="h6" className="light-text">{user.email}</Typography>
                     <hr/>
                     <Logout/>
                 </div> : null}

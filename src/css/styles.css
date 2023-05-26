@@ -17,10 +17,6 @@
 .black-color{
     color: #000000 !important;
 }
-.google-btn-style{
-    margin-top: 24px;
-    width: 100%;
-}
 .no-text-decoration {
     text-decoration: none;
     color: inherit;
@@ -51,20 +47,6 @@ body {
 .mapboxgl-canvas{
     position: absolute;
     width:auto!important;
-}
-/*.mapboxgl-control-container {*/
-/*    position: fixed;*/
-/*    width: 100%;*/
-/*    right: 0;*/
-/*    top: 110px;*/
-/*    display: flex;*/
-/*    flex-direction: column;*/
-/*    justify-content: center;*/
-/*    align-items: center;*/
-/*}*/
-.contained-btn{
-    padding: 6px 16px !important;
-    color: #ffffff;
 }
 body {
     overflow: auto; /* This will add scrolling if the content overflows the element */

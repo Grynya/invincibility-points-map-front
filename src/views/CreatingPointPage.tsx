@@ -17,7 +17,7 @@ import Button from "@mui/material/Button";
 import {makeStyles} from "@material-ui/core/styles";
 import CheckboxResources from "../components/resource/CheckboxResources"
 import 'mapbox-gl/dist/mapbox-gl.css';
-import MapboxSmall from "../components/Map/MapboxSmall";
+import MapboxSmall from "../components/map/MapboxSmall";
 import {TimePicker} from '@mui/x-date-pickers';
 import {LngLatLike} from "mapbox-gl";
 import Resource from "../model/Resource";
@@ -68,13 +68,9 @@ export default function CreatingPointPage() {
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         console.log(formData)
-        await pointService.createPoint(formData, photos, () => {
-            console.log("Added mapPoint")
-            setSuccess({message: "Пункт додано", visible: true})
-        }, (error) => {
-            if (error instanceof Error)
-                setError({message: error.message, visible: true});
-        });
+        await pointService.createPoint(formData, photos,
+            () => setSuccess({message: "Пункт додано", visible: true}),
+            (error) => setError({message: error.response.data, visible: true}));
     };
 
     useEffect(() => {
@@ -145,7 +141,6 @@ export default function CreatingPointPage() {
                         </Button></Box>
                         {!success.visible ?
                             <Box component="form" onSubmit={handleSubmit} noValidate sx={{mt: 1}}>
-                                <ErrorAlert error={error} setError={setError}/>
                                 <TextField
                                     sx={{mt: 1, mb: 1}}
                                     margin="normal"
@@ -161,7 +156,6 @@ export default function CreatingPointPage() {
                                 <TextField
                                     sx={{mt: 1, mb: 1}}
                                     margin="normal"
-                                    required
                                     fullWidth
                                     name="description"
                                     multiline
@@ -230,6 +224,7 @@ export default function CreatingPointPage() {
                                                    setSelectedResources={setSelectedResources}/>
                                 <MapboxSmall coordinates={coordinates}
                                              setCoordinates={setCoordinates}/>
+                                <ErrorAlert error={error} setError={setError}/>
                                 <Button
                                     className={classes.root}
                                     type="submit"
@@ -237,7 +232,7 @@ export default function CreatingPointPage() {
                                     fullWidth
                                     variant="contained"
                                     color="primary"
-                                    sx={{mt: 3}}
+                                    sx={{mt: 3, height: '50px'}}
                                 >
                                     Додати пункт
                                 </Button>

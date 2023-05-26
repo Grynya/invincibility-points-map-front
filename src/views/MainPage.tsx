@@ -1,4 +1,4 @@
-import Mapbox from "../components/Map/Mapbox";
+import Mapbox from "../components/map/Mapbox";
 import * as React from 'react';
 import {useState} from 'react';
 import {styled, Theme, useTheme} from '@mui/material/styles';
@@ -11,8 +11,8 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Header from "../components/Header/Header";
 import {Divider} from "@mui/material";
 import MapPoint from "../model/MapPoint";
-import SidebarContent from "./sidebarСontent/SidebarContent";
-import SidebarAuthorizedContent from "./sidebarСontent/SidebarAuthorizedContent";
+import SidebarContent from "../components/sidebarСontent/SidebarContent";
+import SidebarAuthorizedContent from "../components/sidebarСontent/SidebarAuthorizedContent";
 import {store} from "../store/store";
 
 const drawerWidth = 540;

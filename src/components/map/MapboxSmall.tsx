@@ -51,12 +51,16 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
                         .addTo(mapInstance);
 
                     setCoordinates(markerRef.current!.getLngLat());
-                    getAddress(mapboxAccessToken, markerRef.current!.getLngLat(), setAddressString);
+                    getAddress(mapboxAccessToken, markerRef.current!.getLngLat()).then(result=>{
+                        setAddressString(result);
+                    });
 
                     markerRef.current.on("dragend", () => {
                         const lngLat: LngLatLike = markerRef.current!.getLngLat();
                         setCoordinates({lat: lngLat.lat, lng: lngLat.lng});
-                        getAddress(mapboxAccessToken, lngLat, setAddressString);
+                        getAddress(mapboxAccessToken, lngLat).then(result=>{
+                            setAddressString(result);
+                        });
                     });
                 });
 
@@ -70,7 +74,9 @@ const MapboxSmall: React.FC<Props> = ({coordinates, setCoordinates}) => {
                 // @ts-ignore
                 controlRef.current.on('result', e => {
                     markerRef.current?.setLngLat(e.result.center);
-                    getAddress(mapboxAccessToken, markerRef.current!.getLngLat(), setAddressString);
+                    getAddress(mapboxAccessToken, markerRef.current!.getLngLat()).then(result=>{
+                        setAddressString(result);
+                    });
                 });
                 if (controlRef.current && !mapInstance.hasControl(controlRef.current as IControl)) {
                     mapInstance.addControl(controlRef.current);

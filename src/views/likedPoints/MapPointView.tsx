@@ -6,7 +6,7 @@ import MapPoint from "../../model/MapPoint";
 import Box from "@mui/material/Box";
 import {Divider} from "@mui/material";
 import ResourceView from "../../components/resource/ResourceView";
-import MapboxLikedPoints from "../../components/Map/MapboxLikedPoint";
+import MapboxLikedPoints from "../../components/map/MapboxLikedPoint";
 
 export default function MapPointView({point, children}:{point: MapPoint, children?: React.ReactNode}) {
     return (

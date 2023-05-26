@@ -47,7 +47,9 @@ const MapboxLikedPoints: React.FC<Props> = ({coordinates}) => {
                         .setLngLat(coordinates)
                         .addTo(mapInstance);
 
-                    getAddress(mapboxAccessToken, markerRef.current!.getLngLat(), setAddressString);
+                    getAddress(mapboxAccessToken, markerRef.current!.getLngLat()).then(result=>{
+                        setAddressString(result);
+                    });
 
                 });
             };

@@ -6,8 +6,7 @@ import MapPoint from "../../model/MapPoint";
 import {Typography} from "@material-ui/core";
 import Resource from "../../model/Resource";
 import Container from '@mui/material/Container';
-import ResourceView from "../../components/resource/ResourceView";
-import Button from "@mui/material/Button";
+import ResourceView from "../resource/ResourceView";
 import IconButton from "@mui/material/IconButton";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import {useNavigate} from "react-router-dom";
@@ -20,6 +19,14 @@ import GroupIcon from '@mui/icons-material/Group';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 import authService from "../../service/AuthService";
 import {RatingResponse} from "../../payloads/response/RatingResponse";
+import Paper from '@mui/material/Paper';
+import MenuList from '@mui/material/MenuList';
+import MenuItem from '@mui/material/MenuItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import getAddress from "../map/getAdressString";
+import {store} from "../../store/store";
+import {LngLat} from "mapbox-gl";
 
 export default function SidebarAuthorizedContent({openedPoint, user}:
                                                      { openedPoint: MapPoint | null, user: User }) {
@@ -31,10 +38,11 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
     });
     const likedColor = useRef("gray");
     const dislikedColor = useRef("gray");
+    const [addressString, setAddressString] = useState<string|null>(null);
     const changeRatingInfo = (rating: ERating.LIKED | ERating.DISLIKED, action: 'add' | 'remove') => {
         if (rating === ERating.LIKED) {
             if (action === 'add') {
-                if (ratingInfo.eRating===ERating.DISLIKED){
+                if (ratingInfo.eRating === ERating.DISLIKED) {
                     setRatingInfo(prevState => ({
                         ...prevState,
                         numOfDislikes: prevState.numOfDislikes - 1
@@ -54,7 +62,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
             }
         } else {
             if (action === 'add') {
-                if (ratingInfo.eRating===ERating.LIKED){
+                if (ratingInfo.eRating === ERating.LIKED) {
                     setRatingInfo(prevState => ({
                         ...prevState,
                         numOfLikes: prevState.numOfLikes - 1
@@ -85,7 +93,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     ERating.NOT_RATED,
                     () => {
                         changeRatingInfo(ERating.DISLIKED, 'remove');
-                        dislikedColor.current="gray";
+                        dislikedColor.current = "gray";
                     },
                     () => {
                         console.log("Unable to delete dislike of point");
@@ -99,8 +107,8 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     ERating.DISLIKED,
                     () => {
                         changeRatingInfo(ERating.DISLIKED, 'add');
-                        likedColor.current="gray";
-                        dislikedColor.current="black";
+                        likedColor.current = "gray";
+                        dislikedColor.current = "black";
                     },
                     () => {
                         console.log("Unable to dislike point");
@@ -120,7 +128,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     ERating.NOT_RATED,
                     () => {
                         changeRatingInfo(ERating.LIKED, 'remove');
-                        likedColor.current="gray";
+                        likedColor.current = "gray";
                     },
                     () => {
                         console.log("Unable to delete like of point");
@@ -134,8 +142,8 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                     ERating.LIKED,
                     () => {
                         changeRatingInfo(ERating.LIKED, 'add');
-                        dislikedColor.current="gray";
-                        likedColor.current="red";
+                        dislikedColor.current = "gray";
+                        likedColor.current = "red";
                     },
                     () => {
                         console.log("Unable to like point");
@@ -144,21 +152,31 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
             }
         }
     };
+    useEffect( ()=>{
+        const mapboxAccessToken = store.getState().mapboxAccessToken
+        console.log(openedPoint?.coordinates)
+        if (mapboxAccessToken && openedPoint) {
+            getAddress(mapboxAccessToken, new LngLat(openedPoint.coordinates.lng, openedPoint.coordinates.lat)).then((result)=>{
+                console.log(result)
+                setAddressString(result);
+            })
+        }
+    }, [openedPoint]);
     useEffect(() => {
         setRatingInfo({
             eRating: ERating.NOT_RATED,
             numOfLikes: 0,
             numOfDislikes: 0
         });
-        dislikedColor.current="gray";
-        likedColor.current="gray";
+        dislikedColor.current = "gray";
+        likedColor.current = "gray";
         if (openedPoint) {
             pointService.getRating(openedPoint.id, user.id, (ratingResponse: RatingResponse) => {
                 setRatingInfo(ratingResponse);
                 if (ratingResponse.eRating === ERating.LIKED) {
-                    likedColor.current="red";
+                    likedColor.current = "red";
                 } else if (ratingResponse.eRating === ERating.DISLIKED) {
-                    dislikedColor.current="black"
+                    dislikedColor.current = "black"
                 }
             }, () => {
                 console.log("Unable to load like of point")
@@ -173,24 +191,38 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                 justifyContent: 'center',
                 alignItems: 'center',
                 flexDirection: 'column',
-                margin: '0 25%'
+                margin: '0'
             }}>
-                <Button variant="outlined" size="large" style={{color: 'blue', border: '1px solid blue', width: '100%'}}
-                        onClick={() => navigate('/addpoint')}>
-                    Додати пункт на мапу
-                    <AddLocationAltIcon color="inherit"/>
-                </Button>
-                <Button variant="outlined" size="large" style={{color: 'red', border: '1px solid red', width: '100%'}}
-                        onClick={() => navigate('/likedPoints')}>
-                    Вподобані пункти
-                    <FavoriteIcon color="inherit"/>
-                </Button>
-                {authService.isAdmin(user) ? <Button variant="outlined" size="large"
-                                                     style={{color: 'black', border: '1px solid black', width: '100%'}}
-                                                     onClick={() => navigate('/users')}>
-                    Усі користувачі
-                    <GroupIcon color="inherit"/>
-                </Button> : null}
+                <Paper sx={{width: 540, maxWidth: '100%', p: '0 30px'}}>
+                    <MenuList>
+                        <MenuItem onClick={() => navigate('/addpoint')} style={{height: '80px'}}>
+                            <ListItemIcon>
+                                <AddLocationAltIcon fontSize="large"/>
+                            </ListItemIcon>
+                            <ListItemText>
+                                <Typography style={{fontSize: 'x-large'}}>Додати пункт на мапу</Typography>
+                            </ListItemText>
+                        </MenuItem>
+                        <MenuItem onClick={() => navigate('/likedPoints')} style={{height: '80px'}}>
+                            <ListItemIcon>
+                                <FavoriteIcon fontSize="large"/>
+                            </ListItemIcon>
+                            <ListItemText>
+                                <Typography style={{fontSize: 'x-large'}}>Вподобані пункти</Typography>
+                            </ListItemText>
+                        </MenuItem><br/>
+                        {authService.isAdmin(user) ?
+                            <MenuItem onClick={() => navigate('/users')} style={{height: '80px'}}>
+                                <ListItemIcon>
+                                    <GroupIcon fontSize="large"/>
+                                </ListItemIcon>
+                                <ListItemText>
+                                    <Typography style={{fontSize: 'x-large'}}>Усі користувачі</Typography>
+                                </ListItemText>
+                            </MenuItem> : null}
+                    </MenuList>
+                </Paper>
+
             </Box>
             {!openedPoint ?
                 <Container>
@@ -235,8 +267,12 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
 
                         </Box>
                         <Typography variant="h6">{openedPoint.description}</Typography>
-                        <Typography variant="h6">{`Години роботи: ${openedPoint.hoursOfWork}`}</Typography>
-                        <Typography variant="h6">{`Телефон: ${openedPoint.phone}`}</Typography>
+                    </Container>
+                    <Divider/>
+                    <Container style={{margin: '10px 0'}}>
+                        <Typography variant="h6"><b>Години роботи:</b> {openedPoint.hoursOfWork}</Typography>
+                        <Typography variant="h6"><b>Телефон:</b> {openedPoint.phone}</Typography>
+                        <Typography variant="h6"><b>Адреса:</b> {addressString}</Typography>
                     </Container>
                     <Divider/>
                     <Container style={{margin: '10px 0'}}>
