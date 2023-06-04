@@ -1,8 +1,8 @@
 import axios from 'axios';
-import {store} from "../store/store";
-import {changeUser} from "../store/actionCreators/changeUser";
-import {changeToken} from "../store/actionCreators/changeToken";
-import {changeTokenInfo} from "../store/actionCreators/changeTokenInfo";
+import {store} from "./store/store";
+import {changeUser} from "./store/actionCreators/changeUser";
+import {changeToken} from "./store/actionCreators/changeToken";
+import {changeTokenInfo} from "./store/actionCreators/changeTokenInfo";
 const axiosInstance = axios.create();
 axiosInstance.interceptors.request.use(
     function (config) {

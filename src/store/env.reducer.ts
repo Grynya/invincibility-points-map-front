@@ -1,7 +1,9 @@
 import {
+    SET_ERROR,
     SET_LOCATION,
     SET_MAPBOX_ACCESS_TOKEN,
-    SET_RESOURCES, SET_TOKEN,
+    SET_RESOURCES,
+    SET_TOKEN,
     SET_TOKEN_INFO,
     SET_USER,
     SettingActions
@@ -14,7 +16,9 @@ const initialState: StoreState = {
     location: [31.182233, 48.382778],
     user: null,
     tokenInfo:null,
-    token: null
+    token: null,
+    errorOpen: false,
+    errorMessage: null,
 };
 
 const envReducer = (state = initialState, action: SettingActions) => {
@@ -48,7 +52,13 @@ const envReducer = (state = initialState, action: SettingActions) => {
             return {
                 ...state,
                 token: action.payload
-            }
+            };
+        case SET_ERROR:
+            return {
+                ...state,
+                errorOpen: action.payload.errorOpen,
+                errorMessage: action.payload.errorMessage
+            };
         default:
             return state;
     }

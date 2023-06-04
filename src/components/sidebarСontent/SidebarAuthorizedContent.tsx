@@ -24,6 +24,7 @@ import {store} from "../../store/store";
 import {LngLat} from "mapbox-gl";
 import MenuListItem from "./MenuListItem";
 import MapPointDesc from "./MapPointDesc";
+import {changeError} from "../../store/actionCreators/changeError";
 
 export default function SidebarAuthorizedContent({openedPoint, user}:
                                                      { openedPoint: MapPoint | null, user: User }) {
@@ -75,6 +76,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                         dislikedColor.current = "gray";
                     },
                     () => {
+                        store.dispatch(changeError("Виникла помилка"));
                         console.log("Unable to delete dislike of point");
                     }
                 );
@@ -90,6 +92,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                         dislikedColor.current = "black";
                     },
                     () => {
+                        store.dispatch(changeError("Виникла помилка"));
                         console.log("Unable to dislike point");
                     }
                 );
@@ -110,6 +113,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                         likedColor.current = "gray";
                     },
                     () => {
+                        store.dispatch(changeError("Виникла помилка"));
                         console.log("Unable to delete like of point");
                     }
                 );
@@ -125,6 +129,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                         likedColor.current = "red";
                     },
                     () => {
+                        store.dispatch(changeError("Виникла помилка"));
                         console.log("Unable to like point");
                     }
                 );
@@ -154,9 +159,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                 } else if (ratingResponse.eRating === ERating.DISLIKED) {
                     dislikedColor.current = "black"
                 }
-            }, () => {
-                console.log("Unable to load like of point")
-            })
+            }, (error: Error) => console.log(error));
         }
     }, [openedPoint])
 
@@ -182,7 +185,7 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
                         {authService.isAdmin(user) ?
                             <>
                                 <Divider/>
-                                <MenuListItem onClick={() => navigate('/addpoint')}
+                                <MenuListItem onClick={() => navigate('/users')}
                                               text={"Усі користувачі"}
                                               icon={<GroupIcon fontSize="large"/>}/>
                             </> : null}

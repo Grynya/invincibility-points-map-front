@@ -11,30 +11,26 @@ import Container from '@mui/material/Container';
 import Header from "../../components/header/Header";
 import Copyright from "../../components/Copyright";
 import {useLocation, useNavigate} from "react-router-dom";
-import ErrorAlert from "../../components/alerts/ErrorAlert";
 import Alert from "@mui/material/Alert";
 import {AlertTitle} from "@mui/material";
 import authService from "../../service/AuthService";
+import {store} from "../../store/store";
+import {changeError} from "../../store/actionCreators/changeError";
 
 export default function PasswordRecoveryCodePage() {
     const navigate = useNavigate();
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const email = searchParams.get('userEmail');
-    const [error, setError] = useState({message: "", visible: false});
     const [code, setCode] = useState("");
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (code) {
-            await authService.checkCodePasswordRecovery(email!, code, () => {
-                navigate(`/passwordRecoveryUpdate?userEmail=${email}&code=${code}`);
-            }, (error) => {
-                setError({message: error.response.data.message, visible: true});
-            })
-        } else {
-            setError({message: "No email or password", visible: true});
-        }
+            await authService.checkCodePasswordRecovery(email!, code,
+                () => navigate(`/passwordRecoveryUpdate?userEmail=${email}&code=${code}`),
+                (error) => store.dispatch(changeError(error.response.data.message)))
+        }  else store.dispatch(changeError("Відсутній email або пароль "));
     }
 
     return (
@@ -83,7 +79,6 @@ export default function PasswordRecoveryCodePage() {
                         >
                             Відправити
                         </Button>
-                        <ErrorAlert error={error} setError={setError}/>
                         <Alert severity={"success"} sx={{mt: 3, mb: 3}}>
                             <AlertTitle><strong>Перевірте пошту</strong></AlertTitle>
                             Лист з кодом підтвердження для відновлення паролю відправлено.

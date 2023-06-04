@@ -7,9 +7,10 @@ import getAddress from "./getAdressString";
 
 interface Props {
     coordinates: LngLatLike;
+    height: string;
 }
 
-const MapboxLikedPoints: React.FC<Props> = ({coordinates}) => {
+const MapboxLikedPoints: React.FC<Props> = ({coordinates, height}) => {
     const mapContainer = useRef<HTMLDivElement | null>(null);
     const [map, setMap] = useState<Map | null>(null);
     const markerRef = useRef<Marker | null>(null);
@@ -63,7 +64,7 @@ const MapboxLikedPoints: React.FC<Props> = ({coordinates}) => {
             <InputLabel sx={{mt: 1, mb: 1, fontWeight:"bold", color: "#000000"}}>Адреса: {addressString}</InputLabel>
             <div
                 ref={(el) => (mapContainer.current = el)}
-                style={{height: "30vh"}}/>
+                style={{height: height}}/>
         </div>
     );
 };

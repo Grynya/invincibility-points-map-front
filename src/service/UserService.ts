@@ -4,7 +4,7 @@ import MapPoint from "../model/MapPoint";
 import {JwtResponse} from "../payloads/response/JwtResponse";
 import {store} from "../store/store";
 import {changeUser} from "../store/actionCreators/changeUser";
-import axiosInstance from "./axiosInstance";
+import axiosInstance from "../axiosInstance";
 import User from "../model/User";
 
 class UserService {
@@ -40,7 +40,6 @@ class UserService {
             let result =
                 await axiosInstance
                     .get(`${AppSettings.API_ENDPOINT}/user/likedPoints?userId=${userId}`);
-            console.log(result)
             onSuccess(result.data);
         } catch (error) {
             onFailure(error);

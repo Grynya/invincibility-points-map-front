@@ -23,11 +23,11 @@ import {LngLatLike} from "mapbox-gl";
 import Resource from "../model/Resource";
 import CreatePointRequest from "../payloads/request/CreatePointRequest";
 import dayjs, {Dayjs} from "dayjs";
-import ErrorAlert from "../components/alerts/ErrorAlert";
 import pointService from "../service/MapPointService";
 import {store} from "../store/store";
 import Alert from "@mui/material/Alert";
 import ToMainButton from "../components/ToMainButton";
+import {changeError} from "../store/actionCreators/changeError";
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -47,7 +47,6 @@ export default function CreatingPointPage() {
     const [photos, setPhotos] = useState<FileList | null>(null);
     const classes = useStyles();
     const [success, setSuccess] = useState({message: "", visible: false});
-    const [error, setError] = useState({message: "", visible: false});
     const user = store.getState().user;
     const [startDate, setStartDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'));
     const [endDate, setEndDate] = useState<Dayjs>(dayjs('2022-04-17T00:00'))
@@ -68,7 +67,7 @@ export default function CreatingPointPage() {
         event.preventDefault();
         await pointService.createPoint(formData, photos,
             () => setSuccess({message: "Пункт додано", visible: true}),
-            (error) => setError({message: error.response.data, visible: true}));
+            error=> store.dispatch(changeError(error.message)));
     };
 
     useEffect(() => {
@@ -214,7 +213,6 @@ export default function CreatingPointPage() {
                                                    setSelectedResources={setSelectedResources}/>
                                 <MapboxSmall coordinates={coordinates}
                                              setCoordinates={setCoordinates}/>
-                                <ErrorAlert error={error} setError={setError}/>
                                 <Button
                                     className={classes.root}
                                     type="submit"

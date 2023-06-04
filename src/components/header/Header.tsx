@@ -7,6 +7,7 @@ import AuthMenu from "./AuthMenu";
 import {styled, Theme, useTheme} from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
 import {useNavigate} from "react-router-dom";
+import ErrorAlert from "../../error/ErrorAlert";
 
 const drawerWidth = 540;
 
@@ -35,6 +36,7 @@ export default function Header({children, open}: {children?:ReactElement, open:b
                 open={open}
                 className="yellow-bottom-border black-color" theme={theme}
                 >
+            <ErrorAlert/>
             <Toolbar>
                 {children}
                 <Link style={{textDecoration: 'none', color: 'inherit'}}>

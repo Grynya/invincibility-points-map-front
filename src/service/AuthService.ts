@@ -9,7 +9,7 @@ import MapPoint from "../model/MapPoint";
 import {changeUser} from "../store/actionCreators/changeUser";
 import {changeTokenInfo} from "../store/actionCreators/changeTokenInfo";
 import {changeToken} from "../store/actionCreators/changeToken";
-import axiosInstance from "./axiosInstance";
+import axiosInstance from "../axiosInstance";
 import User from "../model/User";
 
 
@@ -54,18 +54,20 @@ class AuthService {
             this.scheduleTokenRefresh(expiresIn);
             onSuccess();
         } catch (error) {
-                onFailure(error)
+            console.log(error)
+            onFailure(error);
         }
     }
 
-    async signup(signUpRequest: SignUpRequest, onFailure: (error: any) => void,
+    async signup(signUpRequest: SignUpRequest, onFailure: () => void,
                  onSuccess: () => void): Promise<void> {
         try {
             const response: AxiosResponse<JwtResponse> = await axios
                 .post(`${AppSettings.API_ENDPOINT}/public/signup`, signUpRequest);
             if (response.status === HttpStatusCode.Ok) onSuccess();
         } catch (error) {
-            onFailure(error)
+            console.log(error)
+            onFailure();
         }
     }
 
@@ -123,7 +125,7 @@ class AuthService {
             // eslint-disable-next-line no-restricted-globals
             afterLogout();
         } catch (error) {
-            console.log("Unable to logout");
+            console.log(error);
             afterLogout();
         }
     }
@@ -136,7 +138,8 @@ class AuthService {
                 .get(`${AppSettings.API_ENDPOINT}/public/passwordRecovery/sendEmail?userEmail=${userEmail}`);
             onSuccess(result.data);
         } catch (error) {
-            onFailure(error);
+            console.log(error)
+            onFailure(error as Error);
         }
     }
 
@@ -149,7 +152,8 @@ class AuthService {
                 .get(`${AppSettings.API_ENDPOINT}/public/passwordRecovery/checkCode?userEmail=${userEmail}&code=${code}`);
             onSuccess(result.data);
         } catch (error) {
-            onFailure(error);
+            console.log(error)
+            onFailure(error as Error);
         }
     }
 
@@ -163,23 +167,23 @@ class AuthService {
                 .get(`${AppSettings.API_ENDPOINT}/public/passwordRecovery/update?userEmail=${userEmail}&code=${code}&password=${password}`);
             onSuccess(result.data);
         } catch (error) {
-            onFailure(error);
+            console.log(error)
+            onFailure(error as Error);
         }
     }
 
     async isLoggedIn(accessToken: string): Promise<boolean> {
         try {
             const response: AxiosResponse<boolean> = await axios.get(`${AppSettings.API_ENDPOINT}/public/isLoggedIn?token=${accessToken}`);
-            if ( !response.data) store.dispatch(changeUser(null));
+            if (!response.data) store.dispatch(changeUser(null));
             return response.data;
         } catch (error) {
-            // Handle error
             console.error(error);
             return false;
         }
     }
 
-    isAdmin (user: User): boolean {
+    isAdmin(user: User): boolean {
         return user.roles.includes("ROLE_ADMIN");
     }
 }

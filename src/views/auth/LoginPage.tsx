@@ -14,12 +14,12 @@ import Copyright from "../../components/Copyright";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import AuthService from "../../service/AuthService";
-import ErrorAlert from "../../components/alerts/ErrorAlert";
 import {HttpStatusCode} from "axios";
+import {store} from "../../store/store";
+import {changeError} from "../../store/actionCreators/changeError";
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const [error, setError] = useState({message: "", visible: false});
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -27,15 +27,11 @@ export default function LoginPage() {
         event.preventDefault();
         if (username && password) {
             await AuthService.signin(username, password, (error) => {
-                if (error.response.status === HttpStatusCode.Unauthorized) {
-                    setError({message: "Не правильно вказаний логін або пароль", visible: true});
-                } else setError({message: error.response.data.message, visible: true});
-            }, () => {
-                navigate("/");
-            })
-        } else {
-            setError({message: "Не вказано логін або пароль", visible: true});
-        }
+                (error.response.status === HttpStatusCode.Unauthorized) ?
+                    store.dispatch(changeError( "Не правильно вказаний логін або пароль")) :
+                    store.dispatch(changeError(error.response.data.message));
+            }, () => navigate("/"));
+        } else store.dispatch(changeError("Не вказано логін або пароль"));
     }
 
     return (
@@ -94,7 +90,6 @@ export default function LoginPage() {
                             Увійти
                         </Button>
                         <Grid container sx={{mt: 3}}>
-                            <ErrorAlert error={error} setError={setError}/>
                             <Grid item xs>
                                 <Link href="/passwordRecovery" variant="body2">
                                     Забули пароль?

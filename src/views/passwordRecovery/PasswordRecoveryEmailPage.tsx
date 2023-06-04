@@ -11,23 +11,21 @@ import Container from '@mui/material/Container';
 import Header from "../../components/header/Header";
 import Copyright from "../../components/Copyright";
 import {useNavigate} from "react-router-dom";
-import ErrorAlert from "../../components/alerts/ErrorAlert";
 import authService from "../../service/AuthService";
+import {changeError} from "../../store/actionCreators/changeError";
+import {store} from "../../store/store";
 
 export default function PasswordRecoveryEmailPage() {
     const navigate = useNavigate();
-    const [error, setError] = useState({message: "", visible: false});
     const [email, setEmail] = useState("");
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (email) {
-            await authService.sendEmailPasswordRecovery(email, () => {
-                navigate("/passwordRecoveryCode?userEmail="+email);
-            }, (error) => {
-                setError({message: error.response.data.message, visible: true});
-            })
-        } else setError({message: "No email or password", visible: true});
+            await authService.sendEmailPasswordRecovery(email,
+                () => navigate("/passwordRecoveryCode?userEmail="+email),
+                error => store.dispatch(changeError(error.response.data.message)));
+        } else store.dispatch(changeError("Відсутній email або пароль "));
     }
 
     return (
@@ -76,7 +74,6 @@ export default function PasswordRecoveryEmailPage() {
                         >
                             Відправити
                         </Button>
-                        <ErrorAlert error={error} setError={setError}/>
                     </Box>
                 </Box>
                 <Copyright sx={{mt: 8, mb: 4}}/>

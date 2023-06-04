@@ -6,6 +6,8 @@ import {StoreState} from "../../store/StoreState";
 import pointService from "../../service/MapPointService";
 import {Feature, Point} from "geojson";
 import MapPoint from "../../model/MapPoint";
+import {changeError} from "../../store/actionCreators/changeError";
+import {store} from "../../store/store";
 
 interface Props {
     setOpenedPoint: React.Dispatch<React.SetStateAction<MapPoint | null>>;
@@ -15,7 +17,7 @@ interface Props {
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MapBox: React.FC<Props> = ({ setOpenedPoint, open, setOpen}) => {
+const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<Map | null>(null);
     const [control, setControl] = useState<IControl | null>(null);
@@ -95,18 +97,10 @@ const MapBox: React.FC<Props> = ({ setOpenedPoint, open, setOpen}) => {
     useEffect(() => {
         if (map && !open) {
             map.setLayoutProperty('points', 'icon-image', 'placeholder');
-            selectedFeatureIdRef.current=null;
+            selectedFeatureIdRef.current = null;
         }
-    }, [open])
-
-    async function loadPoints(map: Map) {
-        const bounds = map.getBounds();
-        const zoom = map.getZoom();
-        const points: MapPoint[] = await pointService.getPoints({
-            sw: {lng: bounds.getSouthWest().lng, lat: bounds.getSouthWest().lat},
-            ne: {lng: bounds.getNorthEast().lng, lat: bounds.getNorthEast().lat},
-            zoom: zoom
-        })
+    }, [open]);
+    const setPointsToMap = (points: MapPoint[], map: Map) => {
         if (map.getLayer('points')) {
             map.removeLayer('points');
         }
@@ -202,7 +196,20 @@ const MapBox: React.FC<Props> = ({ setOpenedPoint, open, setOpen}) => {
             },
             paint: {}
         });
+    }
 
+    async function loadPoints(map: Map) {
+        const bounds = map.getBounds();
+        const zoom = map.getZoom();
+        await pointService.getPoints({
+                sw: {lng: bounds.getSouthWest().lng, lat: bounds.getSouthWest().lat},
+                ne: {lng: bounds.getNorthEast().lng, lat: bounds.getNorthEast().lat},
+                zoom: zoom
+            }, (points: MapPoint[]) => setPointsToMap(points, map),
+            (error: Error) => {
+                console.log(error.message);
+                store.dispatch(changeError(changeError, "Не вдалося завантажити пункти на мапі"))
+            });
     }
 
     return (

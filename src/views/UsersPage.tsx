@@ -11,7 +11,7 @@ import userService from "../service/UserService";
 import Box from "@mui/material/Box";
 import {Divider} from "@mui/material";
 import {store} from "../store/store";
-import Button from "@mui/material/Button";
+import Button from '@mui/material/Button';
 import User from "../model/User";
 import GroupIcon from "@mui/icons-material/Group";
 import Link from '@mui/material/Link';
@@ -21,6 +21,7 @@ import MapPointView from "./likedPoints/MapPointView";
 import Dialog from '@mui/material/Dialog';
 import TextField from "@mui/material/TextField";
 import ToMainButton from "../components/ToMainButton";
+import {changeError} from "../store/actionCreators/changeError";
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>();
@@ -30,8 +31,12 @@ export default function UsersPage() {
 
     const handleShowPoints = async (user: User) => {
         setCurrentName(user.surname + " " + user.name);
-        setCurrentPoints(await mapPointService.getPointsByUser(user.id));
-        setOpen(true);
+        await mapPointService.getPointsByUser(user.id,
+            (points: MapPoint[]) => {
+                setCurrentPoints(points)
+                setOpen(true);
+            },
+            (error: Error) => console.log(error))
     };
 
     const handleClosePoints = () => {
@@ -55,11 +60,10 @@ export default function UsersPage() {
     }, []);
 
     useEffect(() => {
-        // Filter users based on search query
         if (users) {
             const filtered = users.filter(user =>
-                user.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
+                user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                user.surname.toLowerCase().includes(searchQuery.toLowerCase()));
             setFilteredUsers(filtered);
         }
     }, [searchQuery, users]);
@@ -72,7 +76,10 @@ export default function UsersPage() {
         await mapPointService.deleteMapPoint(pointId,
             () => {
                 setCurrentPoints(currentPoints?.filter(point => point.id !== pointId));
-            }, () => console.log("Unable to delete"));
+            }, () => {
+                store.dispatch(changeError("Не вдалося видалити пункт"));
+                console.log("Unable to delete")
+            });
     }
     return (
         users === null ? <Loading/> :
@@ -98,15 +105,15 @@ export default function UsersPage() {
                         </Typography>
                         <TextField
                             type="text"
-                            sx={{width:'40%', margin: '20px 0'}}
+                            sx={{width: '40%', margin: '20px 0'}}
                             placeholder="Ім'я та прізвище"
                             value={searchQuery}
                             onChange={handleSearch}
                         />
-                        {filteredUsers && filteredUsers.length===0?
-                            <div style={{paddingTop:'25%'}}>
+                        {filteredUsers && filteredUsers.length === 0 ?
+                            <div style={{paddingTop: '25%'}}>
                                 <Typography variant="h6">Користувачі відсутні</Typography>
-                            </div>:null}
+                            </div> : null}
                         {filteredUsers ? filteredUsers.map((user, idx) =>
                             <Container component="main" maxWidth="xl" key={user.id}>
                                 <Container style={{margin: '10px 0'}}>
@@ -140,20 +147,30 @@ export default function UsersPage() {
                                 <Avatar sx={{m: 1, backgroundColor: 'black'}}>
                                     <GroupIcon/>
                                 </Avatar>
-                                <Typography component="h1" variant="h5">Пункти користувача {currentName}
+                                <Typography component="h1" variant="h4" style={{textAlign: 'center'}}>
+                                    Пункти користувача {currentName}
                                 </Typography>
                                 {currentPoints?.length === 0 ?
-                                    <div style={{paddingTop:'25%'}}>
+                                    <div style={{paddingTop: '25%'}}>
                                         <Typography variant="h6">Пункти відсутні</Typography>
                                     </div>
 
                                     : null}
                                 {currentPoints ? currentPoints.map((point, idx) =>
                                     <MapPointView point={point} key={idx} children={
-                                        <Button variant="contained" color="error" style={{margin: 10}}
-                                                onClick={() => handleDeleteMapPoint(point.id)}>
-                                            Видалити пункт
-                                        </Button>
+                                        <React.Fragment>
+                                            <Button fullWidth
+                                                    style={{
+                                                        margin: 10,
+                                                        fontSize: '15px',
+                                                        border: 'solid red',
+                                                        color: 'red',
+                                                        height: '50px'
+                                                    }}
+                                                    onClick={() => handleDeleteMapPoint(point.id)}>
+                                                Видалити пункт
+                                            </Button>
+                                        </React.Fragment>
                                     }/>) : "Не вдалося завантажити пункти"}
                             </Container>
                         </Dialog>

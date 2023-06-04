@@ -11,12 +11,13 @@ import Container from '@mui/material/Container';
 import Copyright from "../../components/Copyright";
 import Header from "../../components/header/Header";
 import AuthService from "../../service/AuthService";
-import ErrorAlert from "../../components/alerts/ErrorAlert";
 import Alert from "@mui/material/Alert";
 import {AlertTitle} from "@mui/material";
+import ToMainButton from "../../components/ToMainButton";
+import {changeError} from "../../store/actionCreators/changeError";
+import {store} from "../../store/store";
 
 export default function RegistrationPage() {
-    const [error, setError] = useState({message: "", visible: false});
     const [hiddenSuccess, setHiddenSuccess] = useState(true);
     const [disabled, setDisabled] = useState(true);
     const [formData, setFormData] = useState({
@@ -37,11 +38,8 @@ export default function RegistrationPage() {
                     email: formData.email,
                     password: formData.password
                 },
-                (error) => {
-                    setError({message: error.response.data.message, visible: true});
-                }, () => {
-                    setHiddenSuccess(false);
-                })
+                () => store.dispatch(changeError("Помилка реєстрації")),
+                () => setHiddenSuccess(false))
         }
     }
 
@@ -144,14 +142,15 @@ export default function RegistrationPage() {
                             >
                                 Зареєструватись
                             </Button>
-                            <ErrorAlert error={error} setError={setError}/>
                         </Box> : null}
                     {!hiddenSuccess ?
-                        <Alert severity="success" sx={{mt: 3, mb: 3}}>
+                        <><Alert severity="success" sx={{mt: 3, mb: 3}}>
                             <AlertTitle>Лист з підтвердженням надіслано на електронну
                                 пошту: {formData.email}</AlertTitle>
                             Перейдіть за посиланням у листі, щоб завершити створення профілю.
-                        </Alert> : null}
+                        </Alert>
+                            <ToMainButton/>
+                        </> : null}
                 </Box>
                 <Copyright sx={{mt: 8, mb: 4}}/>
             </Container>

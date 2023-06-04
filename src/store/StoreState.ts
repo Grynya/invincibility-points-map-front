@@ -11,4 +11,6 @@ export interface StoreState {
     user: User | null;
     tokenInfo: TokenInfo | null;
     token: Token | null;
+    errorOpen: boolean,
+    errorMessage: string | null,
 }

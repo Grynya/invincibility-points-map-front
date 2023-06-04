@@ -10,7 +10,8 @@ import MapboxLikedPoints from "../../components/map/MapboxLikedPoint";
 
 export default function MapPointView({point, children}:{point: MapPoint, children?: React.ReactNode}) {
     return (
-        <Container component="main" maxWidth="xl" key={point.id}>
+        <Container component="main" maxWidth="xl" key={point.id}
+                   style={{border: "solid black thin"}}>
             <Container style={{margin: '10px 0'}}>
                 <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
                     <Typography variant="h3">{point.name}</Typography>
@@ -21,7 +22,7 @@ export default function MapPointView({point, children}:{point: MapPoint, childre
             </Container>
             <Divider/>
             <Container style={{margin: '10px 0', width:"100%"}}>
-                <MapboxLikedPoints coordinates={point.coordinates}/>
+                <MapboxLikedPoints coordinates={point.coordinates} height={"20vh"}/>
                 <Typography variant="h6"><b>Наявні ресурси</b></Typography>
                 {point.resources.map((resource) => <ResourceView resource={resource}/>)}
                 {point.resources.length === 0 ?
