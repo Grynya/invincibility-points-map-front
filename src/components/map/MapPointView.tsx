@@ -10,7 +10,7 @@ import MapboxLikedPoints from "./HiddenMapbox";
 
 export default function MapPointView({point, children}: { point: MapPoint, children?: React.ReactNode }) {
     return (
-        <div style={{position: 'relative', height: 'auto', width:"850px"}}>
+        <div style={{position: 'relative', height: 'auto', width:"850px"}} key={point.id}>
         <Card key={point.id} style={{margin: 15}}>
             <CardContent>
             <Container style={{margin: '10px 0'}}>
