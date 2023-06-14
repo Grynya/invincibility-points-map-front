@@ -1,10 +1,15 @@
-import Keys from "../interfaces/Keys";
+import Keys from "../model/Keys";
 import {AppSettings} from "../AppSettings";
-import axios from 'axios';
+import axiosInstance from "../axiosInstance";
 
 export class KeyService {
-    async getKeys():Promise<Keys>{
-        let res= await axios.get(`${AppSettings.API_ENDPOINT}/keys`);
-        return res.data
+    async getKeys(onSuccess: (result: Keys) => void,
+                   onFailure: (error: Error) => void):Promise<void>{
+        try {
+            let res = await axiosInstance.get(`${AppSettings.API_ENDPOINT}/public/keys`);
+            onSuccess(res.data);
+        } catch (error) {
+            onFailure(error as Error);
+        }
     }
 }
