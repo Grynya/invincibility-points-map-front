@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
-import {Divider, IconButton} from "@mui/material";
+import {IconButton} from "@mui/material";
 import Box from "@mui/material/Box";
 import MapPoint from "../../model/MapPoint";
 import {Typography} from "@material-ui/core";
@@ -174,21 +174,26 @@ export default function SidebarAuthorizedContent({openedPoint, user}:
             }}>
                 <Paper sx={{width: 540, maxWidth: '100%', p: '0 30px'}}>
                     <MenuList>
-                        <MenuListItem onClick={() => navigate('/addpoint')}
-                                      text={"Додати пункт на мапу"}
-                                      icon={<AddLocationAltIcon fontSize="large"/>}
+                        <MenuListItem
+                            key="addPoint"
+                            onClick={() => navigate('/addpoint')}
+                            text="Додати пункт на мапу"
+                            icon={<AddLocationAltIcon fontSize="large"/>}
                         />
-                        <MenuListItem onClick={() => navigate('/likedPoints')}
-                                      text={"Вподобані пункти"}
-                                      icon={<FavoriteIcon fontSize="large"/>}
+                        <MenuListItem
+                            key="likedPoints"
+                            onClick={() => navigate('/likedPoints')}
+                            text="Вподобані пункти"
+                            icon={<FavoriteIcon fontSize="large"/>}
                         />
-                        {authService.isAdmin(user) ?
-                            <>
-                                <Divider/>
-                                <MenuListItem onClick={() => navigate('/users')}
-                                              text={"Усі користувачі"}
-                                              icon={<GroupIcon fontSize="large"/>}/>
-                            </> : null}
+                        {authService.isAdmin(user) && (
+                            <MenuListItem
+                                key="adminFragment"
+                                onClick={() => navigate('/users')}
+                                text="Усі користувачі"
+                                icon={<GroupIcon fontSize="large"/>}
+                            />
+                        )}
                     </MenuList>
                 </Paper>
 

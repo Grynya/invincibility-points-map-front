@@ -5,14 +5,11 @@ import HelpIcon from "@mui/icons-material/Help";
 
 export default function ResourceView({ resource }: { resource: Resource }) {
     return (
-        <React.Fragment key={resource.id}>
-            <Typography key={resource.id}>
-                {resource.name.toUpperCase()}
-                <Tooltip title={resource.description}>
-                <HelpIcon sx={{ fontSize: "small"}} />
+        <Typography key={resource.id}>
+            {resource.name.toUpperCase()}
+            <Tooltip title={resource.description} key={resource.id}>
+                <HelpIcon sx={{ fontSize: "small" }} />
             </Tooltip>
-            </Typography>
-
-        </React.Fragment>
+        </Typography>
     );
 }

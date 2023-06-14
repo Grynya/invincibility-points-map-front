@@ -23,9 +23,10 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
     const [control, setControl] = useState<IControl | null>(null);
     const mapboxAccessToken = useSelector((state: StoreState) => state.mapboxAccessToken);
     const location = useSelector((state: StoreState) => state.location);
+
     useEffect(() => {
         if (mapboxAccessToken && mapContainer.current) {
-            mapboxgl.accessToken = mapboxAccessToken
+            mapboxgl.accessToken = mapboxAccessToken;
 
             const map = new mapboxgl.Map({
                 container: mapContainer.current,
@@ -34,36 +35,34 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
                 maxBounds: [[22.15, 44.39], [40.22, 52.37]],
                 zoom: 12
             });
-            map.loadImage('img/placeholder.png', (error, image) => {
-                if (error) {
-                    console.error('Failed to load the image:', error);
-                } else {
-                    // @ts-ignore
-                    map.addImage('placeholder', image);
-                    map.once('style.load', () => {
-                        loadPoints(map);
-                    });
-                }
-            });
-            map.loadImage('img/placeholder-on-hover.png', (error, image) => {
-                if (error) {
-                    console.error('Failed to load the image:', error);
-                } else {
-                    // @ts-ignore
-                    map.addImage('placeholder-on-hover', image);
-                    map.once('style.load', () => {
-                        loadPoints(map);
-                    });
-                }
-            });
+
+            const loadImage = (imageName: string, imageKey: string) => {
+                map.loadImage(`img/${imageName}`, (error, image) => {
+                    if (error) {
+                        console.error('Failed to load the image:', error);
+                    } else {
+                        // @ts-ignore
+                        map.addImage(imageKey, image);
+                        map.once('style.load', () => {
+                            loadPoints(map);
+                        });
+                    }
+                });
+            };
+
+            loadImage('placeholder.png', 'placeholder');
+            loadImage('placeholder-on-hover.png', 'placeholder-on-hover');
+
             setControl(new MapboxGeocoder({
                 accessToken: mapboxgl.accessToken,
                 mapboxgl: mapboxgl,
                 countries: 'ua'
             }));
+
             map.on('load', function () {
                 loadPoints(map);
             });
+
             map.on('moveend', function () {
                 const zoom = map.getZoom();
                 if (zoom >= 8) {
@@ -71,7 +70,6 @@ const MapBox: React.FC<Props> = ({setOpenedPoint, open, setOpen}) => {
                 } else if (map.getLayer('points')) {
                     map.removeLayer('points');
                 }
-
             });
 
             map.on('zoomend', function () {

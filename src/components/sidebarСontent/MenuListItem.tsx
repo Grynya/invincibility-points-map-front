@@ -4,7 +4,7 @@ import React from "react";
 
 export default function MenuListItem({ icon, text, onClick }:{icon:React.ReactNode, text:string, onClick:React.MouseEventHandler}) {
     return (
-        <MenuItem onClick={onClick} style={{ height: '80px' }}>
+        <MenuItem onClick={onClick} style={{ height: '80px', width:'100%' }}>
             <ListItemIcon>{icon}</ListItemIcon>
             <ListItemText>
                 <Typography style={{ fontSize: 'x-large' }}>{text}</Typography>

@@ -11,7 +11,7 @@ import MapboxLikedPoints from "./HiddenMapbox";
 export default function MapPointView({point, children}: { point: MapPoint, children?: React.ReactNode }) {
     return (
         <div style={{position: 'relative', height: 'auto', width:"850px"}} key={point.id}>
-        <Card key={point.id} style={{margin: 15}}>
+        <Card style={{margin: 15}}>
             <CardContent>
             <Container style={{margin: '10px 0'}}>
                 <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
@@ -23,14 +23,16 @@ export default function MapPointView({point, children}: { point: MapPoint, child
                 <MapboxLikedPoints coordinates={point.coordinates} height={"20vh"}/>
             </Container>
             <Divider/>
-            <Container style={{margin: '10px 0'}}>
-                <Typography variant="h6"><b>Наявні ресурси</b></Typography>
-                {point.resources.map((resource) => <ResourceView resource={resource}/>)}
-                {point.resources.length === 0 ?
-                    <Typography style={{"color": "gray"}}>
-                        <span>Відсутні ресурси</span>
-                    </Typography> : null}
-            </Container>
+                <Container style={{ margin: '10px 0' }}>
+                    <Typography variant="h6"><b>Наявні ресурси</b></Typography>
+                    {point.resources.map((resource) => (
+                        <ResourceView key={`${resource.id}-${point.id}`} resource={resource}/>
+                    ))}
+                    {point.resources.length === 0 ?
+                        <Typography style={{ color: "gray" }}>
+                            <span>Відсутні ресурси</span>
+                        </Typography> : null}
+                </Container>
             <Divider/>
             <Container style={{margin: '10px 0'}}>
                 <Typography variant="h6"><b>Фото</b></Typography>
