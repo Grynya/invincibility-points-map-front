@@ -186,6 +186,20 @@ class AuthService {
     isAdmin(user: User): boolean {
         return user.roles.includes("ROLE_ADMIN");
     }
+
+    async setUserByAccessToken(accessToken: string, onFailure: (error: any) => void,
+                               onSuccess: () => void): Promise<void> {
+        try {
+            const response: AxiosResponse<JwtResponse> =
+                await axiosInstance
+                    .get(`${AppSettings.API_ENDPOINT}/user/info-by-access-token?accessToken=${accessToken}`);
+            const {id, name, surname, email, userStatus, roles} = response.data;
+            store.dispatch(changeUser({id, name, surname, email, userStatus, roles}))
+            onSuccess();
+        } catch (error) {
+            onFailure(error)
+        }
+    }
 }
 
 const authService = new AuthService();

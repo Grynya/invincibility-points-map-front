@@ -7,7 +7,6 @@ import Header from "../../components/header/Header";
 import {Alert, AlertTitle} from '@mui/material';
 import authService from "../../service/AuthService";
 import Button from "@mui/material/Button";
-import userService from "../../service/UserService";
 import {store} from "../../store/store";
 import {changeToken} from "../../store/actionCreators/changeToken";
 
@@ -27,7 +26,7 @@ export default function SuccessVerificationPage() {
 
             authService.scheduleTokenRefresh(parseInt(expiresIn));
 
-            userService.setUserByAccessToken(accessToken, () => {
+            authService.setUserByAccessToken(accessToken, () => {
                 setShowedError(true)
             }, () => {
                 navigate("/");

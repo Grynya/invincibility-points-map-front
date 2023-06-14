@@ -1,3 +1,3 @@
 export class AppSettings {
-    static readonly API_ENDPOINT= 'http://localhost:8080';
+    static readonly API_ENDPOINT= 'http://localhost:8084';
 }
