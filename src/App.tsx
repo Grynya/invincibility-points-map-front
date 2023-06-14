@@ -12,7 +12,7 @@ import {ResourceService} from "./service/ResourceService";
 import {changeLocation} from "./store/actionCreators/changeLocation";
 import ErrorVerificationPage from "./views/verification/ErrorVerificationPage";
 import SuccessVerificationPage from "./views/verification/SuccessVerificationPage";
-import LikedPointsPage from "./views/likedPoints/LikedPointsPage";
+import LikedPointsPage from "./views/LikedPointsPage";
 import PasswordRecoveryEmailPage from "./views/passwordRecovery/PasswordRecoveryEmailPage";
 import PasswordRecoveryCodePage from "./views/passwordRecovery/PasswordRecoveryCodePage";
 import PasswordRecoveryUpdatingPage from "./views/passwordRecovery/PasswordRecoveryUpdatingPage";

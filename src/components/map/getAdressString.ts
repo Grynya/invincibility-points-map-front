@@ -1,9 +1,9 @@
-import mapboxgl, {LngLatLike} from "mapbox-gl";
+import mapboxgl, {LngLat, LngLatLike} from "mapbox-gl";
 import MapboxGeocoding from "@mapbox/mapbox-sdk/services/geocoding";
 
-const getAddress = async (mapboxAccessToken:string, lngLat: LngLatLike): Promise<string | null>=> {
+const getAddress = async (mapboxAccessToken:string, lngLat:any): Promise<string | null>=> {
     const geocodingClient = MapboxGeocoding({ accessToken: mapboxAccessToken });
-        if (lngLat && lngLat instanceof mapboxgl.LngLat) {
+        if (lngLat) {
             const response = await geocodingClient.reverseGeocode({
                 query: [lngLat.lng, lngLat.lat],
                 types: ["address"],

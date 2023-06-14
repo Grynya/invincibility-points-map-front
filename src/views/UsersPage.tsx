@@ -17,7 +17,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import Link from '@mui/material/Link';
 import MapPoint from "../model/MapPoint";
 import mapPointService from "../service/MapPointService";
-import MapPointView from "./likedPoints/MapPointView";
+import MapPointView from "../components/map/MapPointView";
 import Dialog from '@mui/material/Dialog';
 import TextField from "@mui/material/TextField";
 import ToMainButton from "../components/ToMainButton";
@@ -136,7 +136,7 @@ export default function UsersPage() {
                                 <Divider/>
                             </Container>
                         ) : "Не вдалося завантажити користувачів"}
-                        <Dialog onClose={handleClosePoints} open={open}>
+                        <Dialog onClose={handleClosePoints} fullWidth={true} maxWidth={"md"} open={open}>
                             <Container style={{
                                 marginTop: 8,
                                 display: 'flex',

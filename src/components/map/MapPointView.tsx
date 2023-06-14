@@ -4,14 +4,15 @@ import Container from '@mui/material/Container';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import MapPoint from "../../model/MapPoint";
 import Box from "@mui/material/Box";
-import {Divider} from "@mui/material";
-import ResourceView from "../../components/resource/ResourceView";
-import MapboxLikedPoints from "../../components/map/MapboxLikedPoint";
+import {Card, CardContent, Divider} from "@mui/material";
+import ResourceView from "../resource/ResourceView";
+import MapboxLikedPoints from "./HiddenMapbox";
 
-export default function MapPointView({point, children}:{point: MapPoint, children?: React.ReactNode}) {
+export default function MapPointView({point, children}: { point: MapPoint, children?: React.ReactNode }) {
     return (
-        <Container component="main" maxWidth="xl" key={point.id}
-                   style={{border: "solid black thin"}}>
+        <div style={{position: 'relative', height: 'auto', width:"850px"}}>
+        <Card key={point.id} style={{margin: 15}}>
+            <CardContent>
             <Container style={{margin: '10px 0'}}>
                 <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2}}>
                     <Typography variant="h3">{point.name}</Typography>
@@ -19,10 +20,10 @@ export default function MapPointView({point, children}:{point: MapPoint, childre
                 <Typography variant="h6">{point.description}</Typography>
                 <Typography variant="h6">{`Години роботи: ${point.hoursOfWork}`}</Typography>
                 <Typography variant="h6">{`Телефон: ${point.phone}`}</Typography>
+                <MapboxLikedPoints coordinates={point.coordinates} height={"20vh"}/>
             </Container>
             <Divider/>
-            <Container style={{margin: '10px 0', width:"100%"}}>
-                <MapboxLikedPoints coordinates={point.coordinates} height={"20vh"}/>
+            <Container style={{margin: '10px 0'}}>
                 <Typography variant="h6"><b>Наявні ресурси</b></Typography>
                 {point.resources.map((resource) => <ResourceView resource={resource}/>)}
                 {point.resources.length === 0 ?
@@ -47,6 +48,8 @@ export default function MapPointView({point, children}:{point: MapPoint, childre
                     </Typography> : null}
                 {children}
             </Container>
-        </Container>
+            </CardContent>
+        </Card>
+        </div>
     );
 }

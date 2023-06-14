@@ -56,3 +56,6 @@ input#input-file-upload-button{
     color: #D70040 !important;
     display: none;
 }
+.pointer{
+    cursor: pointer;
+}
